@@ -10,6 +10,8 @@ export default function InterviewFlow({ apiBase = "http://localhost:8080" }: { a
   const REC_TIME = 10;
 
   const [rolePrompt, setRolePrompt] = useState("");
+  const [company, setCompany] = useState("");
+  const [interviewType, setInterviewType] = useState("behavioural");
   const [questions, setQuestions] = useState<GeneratedQuestion[] | null>(null);
   const [phase, setPhase] = useState<"idle" | "generating" | "ready" | "blocked" | "prep" | "recording" | "done">("idle");
 
@@ -38,7 +40,7 @@ export default function InterviewFlow({ apiBase = "http://localhost:8080" }: { a
       const res = await fetch(`${apiBase}/api/generate-questions`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ rolePrompt }),
+        body: JSON.stringify({ rolePrompt, company, interviewType, count: 2 }),
       });
       if (!res.ok) throw new Error(await res.text());
       const data = await res.json();
@@ -390,6 +392,31 @@ export default function InterviewFlow({ apiBase = "http://localhost:8080" }: { a
                   placeholder='e.g. "Product Manager — e-commerce"'
                   className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
                 />
+              </div>
+
+              <div className="grid grid-cols-2 gap-2">
+                <div className="space-y-2">
+                  <label className="text-sm font-medium leading-none">Company</label>
+                  <input
+                    type="text"
+                    value={company}
+                    onChange={(e) => setCompany(e.target.value)}
+                    placeholder="e.g. Google"
+                    className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <label className="text-sm font-medium leading-none">Interview type</label>
+                  <select
+                    value={interviewType}
+                    onChange={(e) => setInterviewType(e.target.value)}
+                    className="flex h-10 w-full rounded-md border border-input bg-background px-3 text-sm"
+                  >
+                    <option value="behavioural">Behavioural</option>
+                    <option value="hr">HR</option>
+                    <option value="case">Case</option>
+                  </select>
+                </div>
               </div>
 
               <div className="flex gap-2">

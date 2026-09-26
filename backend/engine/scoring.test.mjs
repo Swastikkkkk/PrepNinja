@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { topicScore, bktMastery, successProbability, deadlinePressure, priority, buildRoadmap } from "./scoring.mjs";
+import { practiceStreak, badges, topicScore, bktMastery, successProbability, deadlinePressure, priority, buildRoadmap } from "./scoring.mjs";
 import { PREREQS, TOPICS } from "./prerequisites.mjs";
 
 const DAY = 86_400_000;
@@ -58,4 +58,14 @@ test("mastered topics drop out of the roadmap", () => {
   const cw = { arrays: 0.5, strings: 0.5 };
   const r = buildRoadmap({ topicScores: { arrays: 0.9 }, companyWeights: cw, prereqs: PREREQS, weeksTotal: 4, weeksLeft: 4, dailyHours: 2 });
   assert.deepEqual(r.ordered.map((x) => x.topic), ["strings"]);
+});
+
+test("streak counts consecutive days and resets after 48 h", () => {
+  const a = [att(true, 1, 5), att(true, 1, 4), att(true, 1, 3), att(true, 1, 0)];
+  assert.deepEqual(practiceStreak(a, now), { current: 1, best: 3 });
+  assert.equal(practiceStreak([att(true, 1, 3)], now).current, 0);
+});
+
+test("badges only for mastered topics", () => {
+  assert.deepEqual(badges({ arrays: 0.85, trees: 0.4, graphs: null }), [{ id: "mastery:arrays", topic: "arrays" }]);
 });

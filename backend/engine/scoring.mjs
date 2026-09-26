@@ -153,3 +153,26 @@ export function buildRoadmap({ topicScores, companyWeights, prereqs, weeksTotal,
   if (cur.items.length) weeks.push(cur);
   return { ordered: ordered.map((x) => ({ ...x, priority: +x.priority.toFixed(3) })), weeks, deadlinePressure: +u.toFixed(3) };
 }
+
+/**
+ * Practice streak: consecutive sessions where each gap is at most 48 hours.
+ * current is 0 if the last attempt is older than 48 hours.
+ */
+export function practiceStreak(attempts, now = Date.now(), maxGapMs = 48 * 3_600_000) {
+  const days = [...new Set(attempts.map((a) => Math.floor(a.at / 86_400_000)))].sort((x, y) => x - y);
+  if (!days.length) return { current: 0, best: 0 };
+  let best = 1, run = 1;
+  for (let i = 1; i < days.length; i++) {
+    run = (days[i] - days[i - 1]) * 86_400_000 <= maxGapMs ? run + 1 : 1;
+    best = Math.max(best, run);
+  }
+  const lastAt = Math.max(...attempts.map((a) => a.at));
+  return { current: now - lastAt <= maxGapMs ? run : 0, best };
+}
+
+/** Mastery badges: one per topic whose score has reached the mastery threshold. */
+export function badges(topicScores, mastery = DEFAULTS.mastery) {
+  return Object.entries(topicScores)
+    .filter(([, ts]) => ts !== null && ts >= mastery)
+    .map(([t]) => ({ id: `mastery:${t}`, topic: t }));
+}

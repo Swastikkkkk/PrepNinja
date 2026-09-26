@@ -46,6 +46,16 @@ function getMimeType(fileName) {
   return mimeTypes[ext] || 'application/octet-stream';
 }
 
+// Table 5.1 weights (points out of 100)
+const ATS_WEIGHTS = {
+  keyword_coverage: 35,
+  section_completeness: 20,
+  formatting_compliance: 20,
+  achievement_quantification: 15,
+  action_verbs: 10,
+};
+const ATS_MODEL = process.env.ATS_MODEL || 'gemini-2.5-flash';
+
 // ATS Analysis Endpoint
 router.post('/analyze-resume', upload.single('file'), async (req, res) => {
   try {
@@ -76,63 +86,45 @@ router.post('/analyze-resume', upload.single('file'), async (req, res) => {
     console.log(`File converted to base64: ${fileData.length} characters`);
 
     // Initialize the generative model
-    const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash' });
+    const model = genAI.getGenerativeModel({ model: ATS_MODEL });
 
-    // Create the prompt for ATS analysis
-    const prompt = `You are an expert ATS (Applicant Tracking System) analyzer and resume expert. Analyze this resume and provide:
+    // Optional target role and job description make keyword scoring job-specific.
+    const targetRole = String(req.body?.targetRole || '').slice(0, 200);
+    const jobDescription = String(req.body?.jobDescription || '').slice(0, 8000);
 
-1. **ATS Score** (0-100): Rate how well this resume will perform with ATS systems. Consider:
-   - Use of standard formatting
-   - Keyword optimization
-   - Clarity and structure
-   - File format compatibility
-   - Section organization
-   - Proper use of bullet points
-   - Clear job titles and company names
-   - Quantifiable achievements
+    // Five scoring dimensions (paper Table 5.1). Gemini rates each 0-1; the weighted
+    // total is computed here so the weights are fixed and auditable.
+    const prompt = `You are an ATS (Applicant Tracking System) resume auditor.
+${targetRole ? `Target role: ${targetRole}` : 'Target role: infer from the resume.'}
+${jobDescription ? `Job description:\n"""${jobDescription}"""` : 'No job description was given; judge keywords against typical postings for the target role.'}
 
-2. **Strengths** (list 4-5 key strengths):
-   - What aspects of the resume are ATS-friendly
-   - What stands out positively
-   - Well-formatted sections
-   - Good use of keywords
+Rate the attached resume on each dimension from 0.0 to 1.0:
+- keyword_coverage: presence of role-relevant technical and soft-skill keywords
+- section_completeness: Education, Experience, Skills and Projects sections all present
+- formatting_compliance: no tables, text boxes, columns or graphics that confuse ATS parsers
+- achievement_quantification: experience bullets contain numeric results
+- action_verbs: bullets start with strong, varied action verbs
 
-3. **Weaknesses** (list 4-5 areas to improve):
-   - ATS-unfriendly formatting or content
-   - Missing important keywords or sections
-   - Structural issues
-   - Hard to parse information
+Also list the role-relevant keywords found in the resume and important ones that are missing.
 
-4. **Actionable Improvement Tips** (provide 6-8 specific, detailed tips):
-   - How to improve the ATS score
-   - Specific changes to make
-   - Keywords to add based on the resume
-   - Format improvements
-   - Section suggestions
-
-Please respond ONLY with valid JSON in this exact format:
+Respond ONLY with JSON:
 {
-  "score": <number between 0-100>,
-  "strengths": ["strength1", "strength2", "strength3", "strength4", "strength5"],
-  "weaknesses": ["weakness1", "weakness2", "weakness3", "weakness4", "weakness5"],
-  "suggestions": ["tip1", "tip2", "tip3", "tip4", "tip5", "tip6", "tip7", "tip8"]
-}
-
-Make sure all arrays have the specified number of items. Do not include any text outside the JSON.`;
+  "dimensions": {"keyword_coverage": 0.0, "section_completeness": 0.0, "formatting_compliance": 0.0, "achievement_quantification": 0.0, "action_verbs": 0.0},
+  "keywords_found": ["..."],
+  "keywords_missing": ["..."],
+  "strengths": ["4-5 items"],
+  "weaknesses": ["4-5 items"],
+  "suggestions": ["6-8 specific rewrite tips"]
+}`;
 
     try {
       console.log("Sending request to Gemini API...");
       
       // Analyze resume with Gemini
-      const result = await model.generateContent([
-        {
-          inlineData: {
-            mimeType: mimeType,
-            data: fileData,
-          },
-        },
-        prompt,
-      ]);
+      const result = await model.generateContent({
+        contents: [{ role: 'user', parts: [{ inlineData: { mimeType, data: fileData } }, { text: prompt }] }],
+        generationConfig: { temperature: 0.2, responseMimeType: 'application/json' },
+      });
 
       console.log("✓ Received response from Gemini");
 
@@ -155,17 +147,17 @@ Make sure all arrays have the specified number of items. Do not include any text
       }
 
       // Validate response structure
-      if (
-        typeof analysisResult.score !== 'number' ||
-        !Array.isArray(analysisResult.strengths) ||
-        !Array.isArray(analysisResult.weaknesses) ||
-        !Array.isArray(analysisResult.suggestions)
-      ) {
+      const dims = analysisResult.dimensions || {};
+      const missing = Object.keys(ATS_WEIGHTS).filter((k) => typeof dims[k] !== 'number');
+      if (missing.length || !Array.isArray(analysisResult.strengths) || !Array.isArray(analysisResult.suggestions)) {
         throw new Error('Invalid analysis response structure');
       }
 
-      // Ensure score is between 0-100
-      const score = Math.min(100, Math.max(0, analysisResult.score));
+      // Weighted total out of 100 (Table 5.1 weights)
+      const breakdown = Object.fromEntries(
+        Object.entries(ATS_WEIGHTS).map(([k, w]) => [k, Math.round(Math.min(1, Math.max(0, dims[k])) * w * 10) / 10]),
+      );
+      const score = Math.round(Object.values(breakdown).reduce((x, y) => x + y, 0));
 
       // Clean up uploaded file
       fs.unlinkSync(filePath);
@@ -174,8 +166,13 @@ Make sure all arrays have the specified number of items. Do not include any text
 
       res.json({
         score,
+        breakdown,
+        weights: ATS_WEIGHTS,
+        keywordsFound: analysisResult.keywords_found || [],
+        keywordsMissing: analysisResult.keywords_missing || [],
+        model: ATS_MODEL,
         strengths: analysisResult.strengths,
-        weaknesses: analysisResult.weaknesses,
+        weaknesses: analysisResult.weaknesses || [],
         suggestions: analysisResult.suggestions,
       });
     } catch (geminiError) {

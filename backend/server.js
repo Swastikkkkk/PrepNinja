@@ -120,23 +120,29 @@ async function callGemini(promptText, model = "gemini-2.5-flash") {
 // ----------------------------
 app.post("/api/generate-questions", async (req, res) => {
   try {
-    const { rolePrompt } = req.body || {};
+    const { rolePrompt, company = "", interviewType = "behavioural", count = 2 } = req.body || {};
     if (!rolePrompt || typeof rolePrompt !== "string") {
       return res.status(400).json({ error: "rolePrompt required" });
     }
+    const n = Math.max(1, Math.min(15, parseInt(count) || 2));
+    const type = ["behavioural", "hr", "case"].includes(String(interviewType).toLowerCase()) ? String(interviewType).toLowerCase() : "behavioural";
+    const org = String(company).slice(0, 80);
 
     if (GEMINI_API_KEY) {
+      // Persona conditioning: a consistent interviewer identity tied to the target company.
       const prompt = `
-You are an interviewer question generator. Given this role/prompt produce EXACTLY TWO concise interview questions suitable for a short recorded interview.
-Role/prompt: "${rolePrompt}"
+You are a senior interviewer${org ? ` at ${org}` : ""} running a ${type} interview for this role: "${rolePrompt}".
+Stay in this persona: ask the kind of questions ${org || "a strong technology company"} is known to ask for this role${org ? ", reflecting its stated values and culture" : ""}.
+Produce EXACTLY ${n} interview question${n > 1 ? "s" : ""} for a recorded interview.
 
 Requirements:
-- Output exactly two questions separated by a blank line. No numbering or commentary.
-- Keep each question one or two sentences, behaviorally or scenario focused when possible.
+- Output the questions separated by a blank line. No numbering or commentary.
+- Keep each question one or two sentences, behavioural or scenario focused.
+- Cover different competencies (e.g. conflict, failure, ownership, leadership, ambiguity).
 `;
       const out = await callGemini(prompt);
-      const parts = out.split(/\n\s*\n/).map(p => p.trim()).filter(Boolean).slice(0, 2);
-      if (parts.length >= 2) {
+      const parts = out.split(/\n\s*\n/).map(p => p.trim()).filter(Boolean).slice(0, n);
+      if (parts.length >= Math.min(2, n)) {
         const questions = parts.map(q => ({ id: `q-${nanoid(6)}`, text: q }));
         return res.json({ questions });
       }

@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
-import { ArrowLeft, CalendarRange, Code2, Gauge, Loader2, RefreshCw, Target, Trash2 } from "lucide-react";
+import { ArrowLeft, Award, CalendarRange, Flame, Code2, Gauge, Loader2, RefreshCw, Target, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -134,6 +134,7 @@ export default function Dashboard() {
                   <div className="flex gap-2 flex-wrap justify-center">
                     <Badge variant="secondary">{state.attempts} attempts</Badge>
                     <Badge variant="secondary">mode: {state.mode}</Badge>
+                    <Badge variant="secondary"><Flame className="w-3 h-3" /> {state.streak.current} day streak (best {state.streak.best})</Badge>
                     {!state.weightsKnown && <Badge variant="outline">uniform weights</Badge>}
                   </div>
                 </CardContent>
@@ -191,6 +192,13 @@ export default function Dashboard() {
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
+                  {state.badges.length > 0 && (
+                    <div className="flex flex-wrap gap-2 mb-3">
+                      {state.badges.map((b) => (
+                        <Badge key={b.id} className="gap-1"><Award className="w-3 h-3" /> {label(b.topic)} mastery</Badge>
+                      ))}
+                    </div>
+                  )}
                   {topics.map(([t, x]) => (
                     <TopicRow key={t} topic={t} ts={x.ts} n={x.n} weight={state.companyWeights[t] ?? 0} mastery={state.mastery} />
                   ))}

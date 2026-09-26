@@ -3,7 +3,7 @@ import express from "express";
 import fs from "fs-extra";
 import path from "path";
 import { fileURLToPath } from "url";
-import { topicScore, bktMastery, successProbability, buildRoadmap, DEFAULTS, PRESETS } from "./scoring.mjs";
+import { topicScore, bktMastery, successProbability, buildRoadmap, practiceStreak, badges, DEFAULTS, PRESETS } from "./scoring.mjs";
 import { TOPICS, PREREQS } from "./prerequisites.mjs";
 import { createStore } from "./store.mjs";
 
@@ -109,6 +109,8 @@ async function computeState(uid) {
     successProbability: +successProbability(scores, cw).toFixed(4),
     companyWeights: cw, weightsKnown: Boolean(CW.weights[profile.targetCompany]),
     roadmap, mastery: DEFAULTS.mastery, attempts: attempts.length,
+    streak: practiceStreak(attempts, now),
+    badges: badges(Object.fromEntries(Object.entries(topics).map(([t, x]) => [t, x.ts]))),
   };
 }
 

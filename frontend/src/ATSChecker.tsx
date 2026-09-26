@@ -9,6 +9,10 @@ import { CardBody, CardContainer, CardItem } from "@/components/ui/3d-card";
 
 interface ATSScore {
   score: number;
+  breakdown?: Record<string, number>;
+  weights?: Record<string, number>;
+  keywordsFound?: string[];
+  keywordsMissing?: string[];
   strengths: string[];
   weaknesses: string[];
   suggestions: string[];
@@ -23,6 +27,8 @@ export default function ATSChecker() {
   const [loading, setLoading] = useState(false);
   const [atsScore, setATSScore] = useState<ATSScore | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [targetRole, setTargetRole] = useState("");
+  const [jobDescription, setJobDescription] = useState("");
   const fileInputRef = useRef<HTMLInputElement>(null);
 
 
@@ -81,6 +87,8 @@ export default function ATSChecker() {
     try {
       const formData = new FormData();
       formData.append('file', file);
+      if (targetRole.trim()) formData.append('targetRole', targetRole.trim());
+      if (jobDescription.trim()) formData.append('jobDescription', jobDescription.trim());
 
 
 
@@ -132,6 +140,10 @@ export default function ATSChecker() {
         strengths: data.strengths.slice(0, 5),
         weaknesses: data.weaknesses.slice(0, 5),
         suggestions: data.suggestions.slice(0, 8),
+        breakdown: data.breakdown,
+        weights: data.weights,
+        keywordsFound: data.keywordsFound,
+        keywordsMissing: data.keywordsMissing,
       });
     } catch (error) {
       console.error('Error analyzing resume:', error);
@@ -237,6 +249,22 @@ export default function ATSChecker() {
 
 
 
+              <CardItem translateZ="35" className="w-full mb-8 space-y-3">
+                <input
+                  value={targetRole}
+                  onChange={(e) => setTargetRole(e.target.value)}
+                  placeholder="Target role (optional), e.g. SDE-1 Backend"
+                  className="w-full h-10 rounded-md border bg-background px-3 text-sm"
+                />
+                <textarea
+                  value={jobDescription}
+                  onChange={(e) => setJobDescription(e.target.value)}
+                  placeholder="Paste the job description (optional) for job-specific keyword matching"
+                  rows={4}
+                  className="w-full rounded-md border bg-background px-3 py-2 text-sm resize-y"
+                />
+              </CardItem>
+
               {error && (
                 <CardItem translateZ="35" className="w-full mb-8">
                   <div className="bg-destructive/10 border border-destructive/50 text-destructive p-4 rounded-lg flex items-start space-x-2">
@@ -328,6 +356,37 @@ export default function ATSChecker() {
 
               {/* Stats */}
               <div className="md:col-span-2 space-y-4">
+                {atsScore.breakdown && atsScore.weights && (
+                  <div className="bg-card border border-border rounded-xl p-6">
+                    <h3 className="font-semibold text-foreground mb-3">Score breakdown</h3>
+                    <div className="space-y-2">
+                      {Object.entries(atsScore.weights).map(([k, w]) => {
+                        const got = atsScore.breakdown?.[k] ?? 0;
+                        return (
+                          <div key={k} className="grid grid-cols-[180px_1fr_70px] items-center gap-3 text-sm">
+                            <span className="capitalize">{k.replace(/_/g, " ")}</span>
+                            <div className="h-2 bg-muted rounded-full overflow-hidden">
+                              <div className="h-full bg-primary" style={{ width: `${(got / w) * 100}%` }} />
+                            </div>
+                            <span className="text-right tabular-nums text-muted-foreground">{got} / {w}</span>
+                          </div>
+                        );
+                      })}
+                    </div>
+                    {(atsScore.keywordsFound?.length || atsScore.keywordsMissing?.length) ? (
+                      <div className="grid sm:grid-cols-2 gap-4 mt-4 text-sm">
+                        <div>
+                          <div className="font-medium mb-1">Keywords found</div>
+                          <div className="flex flex-wrap gap-1">{atsScore.keywordsFound?.map((k) => <span key={k} className="px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-700 dark:text-emerald-400">{k}</span>)}</div>
+                        </div>
+                        <div>
+                          <div className="font-medium mb-1">Keywords missing</div>
+                          <div className="flex flex-wrap gap-1">{atsScore.keywordsMissing?.map((k) => <span key={k} className="px-2 py-0.5 rounded bg-rose-500/10 text-rose-700 dark:text-rose-400">{k}</span>)}</div>
+                        </div>
+                      </div>
+                    ) : null}
+                  </div>
+                )}
                 <div className="bg-card border border-border rounded-xl p-6 hover:border-primary/50 transition-colors">
                   <div className="flex items-start space-x-4">
                     <div className="p-3 bg-primary/10 rounded-lg">

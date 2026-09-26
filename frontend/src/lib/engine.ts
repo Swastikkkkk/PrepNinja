@@ -27,6 +27,8 @@ export type EngineState = {
   roadmap: { ordered: RoadmapItem[]; weeks: { week: number; hours: number; items: RoadmapItem[] }[]; deadlinePressure: number };
   mastery: number;
   attempts: number;
+  streak: { current: number; best: number };
+  badges: { id: string; topic: string }[];
 };
 
 async function call<T>(path: string, init?: RequestInit): Promise<T> {

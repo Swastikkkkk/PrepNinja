@@ -7,7 +7,7 @@ PrepNinja helps candidates prepare for both non-technical and technical intervie
 ## Features
 
 ### 🎤 Non-technical (behavioral) mock interviews
-- Gemini generates two role-specific interview questions from a free-text role/prompt.
+- Gemini generates role-specific questions from an interviewer persona conditioned on the target company and interview type (behavioural, HR, case).
 - Candidate records video answers via webcam (`MediaRecorder`), uploaded and stored on Cloudinary.
 - Answers are transcribed with Deepgram and scored by Gemini across **fluency, correctness, grammar, stammering, and content** (0–10 each, 50 total), with a rule-based fallback if AI scoring is unavailable.
 - **Proctoring**: enforces fullscreen mode and flags tab switches / fullscreen exits as suspicious events.
@@ -21,13 +21,15 @@ PrepNinja helps candidates prepare for both non-technical and technical intervie
 
 ### 📄 ATS Resume Analyzer
 - Upload a PDF/DOC/DOCX resume.
-- Gemini returns an ATS score (0–100), strengths, weaknesses, and specific, actionable improvement tips.
+- Optional target role and job description for job-specific keyword matching.
+- Gemini rates five dimensions (keyword coverage 35, section completeness 20, formatting 20, quantified achievements 15, action verbs 10); the weighted 0–100 total is computed server-side. Returns found and missing keywords, strengths, weaknesses and rewrite tips.
 
 ### 📈 Skill Scoring Engine and adaptive roadmap
 - Every coding attempt updates a per-topic Topic Score from accuracy, solve speed and recency (Eq. 1).
 - Topic scores roll up into a company-weighted readiness index (Eq. 2). Company topic weights are built from public company-tagged interview problems for 52 companies (`research/company_weights`).
 - A roadmap orders non-mastered topics by priority (Eq. 3) under a prerequisite graph and packs them into weekly study blocks sized to the user's daily hours.
 - Scoring modes: `tuned` (default, weights chosen by the offline benchmark), `paper` (original hand-set weights) or `bkt` (Bayesian Knowledge Tracing).
+- Practice streaks (reset after 48 h without a session) and per-topic mastery badges.
 - Dashboard at `/dashboard`; data can be deleted from the dashboard (`DELETE /api/engine/user/:uid`).
 
 ### 🔬 Research artefacts (`research/`)
