@@ -10,5 +10,13 @@
     "nanoid": "^5.1.6",
     "node-fetch": "^3.3.2",
     "undici": "^7.16.0"
+  },
+  "scripts": {
+    "start": "node server.js",
+    "start:code": "node info.js",
+    "test": "node --test engine/scoring.test.mjs"
+  },
+  "optionalDependencies": {
+    "firebase-admin": "^13.5.0"
   }
 }

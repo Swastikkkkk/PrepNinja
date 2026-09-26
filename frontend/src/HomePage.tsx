@@ -420,6 +420,16 @@ const HomePage: React.FC = () => {
             <p className="text-xl text-primary-foreground/90 mb-8 max-w-2xl mx-auto">
               Choose your preparation path and start your journey to landing your dream job today.
             </p>
+            <div className="flex flex-wrap gap-4 justify-center">
+            <Link to="/dashboard">
+              <Button
+                size="lg"
+                variant="outline"
+                className="text-lg px-8 py-6 bg-transparent text-primary-foreground border-primary-foreground/40 hover:bg-primary-foreground/10"
+              >
+                Open Dashboard
+              </Button>
+            </Link>
             <Link to="/interview-flow">
               <Button
                 size="lg"
@@ -429,6 +439,7 @@ const HomePage: React.FC = () => {
                 Get Started <Zap className="ml-2 w-5 h-5" />
               </Button>
             </Link>
+            </div>
           </div>
         </section>
       </SectionWrapper>

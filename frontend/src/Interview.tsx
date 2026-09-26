@@ -1,8 +1,10 @@
 import React, { useEffect, useRef, useState, useCallback } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
+import Editor from "@monaco-editor/react";
+import { engine } from "@/lib/engine";
 import { Eye, EyeOff, Video, VideoOff, Play, RotateCcw, Send, Clock, AlertTriangle, CheckCircle2, Loader2, Volume2, CheckCircle, X } from "lucide-react";
 
-type Question = { id?: string; text: string };
+type Question = { id?: string; text: string; difficulty?: string; tests?: { stdin: string; expected: string }[]; validated?: boolean };
 type NavState = {
   role?: string;
   language?: string;
@@ -76,6 +78,7 @@ export default function Interview() {
   const role = state?.role || "Software Engineer";
 
   const [questions, setQuestions] = useState<Question[]>([]);
+  const questionStart = useRef<number>(Date.now());
   const [questionsLoading, setQuestionsLoading] = useState(true);
   const [questionsError, setQuestionsError] = useState<string | null>(null);
 
@@ -136,6 +139,7 @@ export default function Interview() {
         console.log(`✅ Got ${fetchedQuestions.length} questions:`, fetchedQuestions);
         setQuestions(fetchedQuestions);
         setIndex(0);
+        questionStart.current = Date.now();
         setQuestionsLoading(false);
       } catch (err) {
         const errorMsg = err instanceof Error ? err.message : String(err);
@@ -433,7 +437,10 @@ export default function Interview() {
     setTestResults([]);
     const currentQuestion = questions[index];
     const testCaseKey = `${currentQuestion.id}-${topic}`;
-    const tests = TEST_CASES[testCaseKey] || [];
+    // Prefer generated tests that the backend validated against a reference solution.
+    const tests: TestCase[] = currentQuestion.tests?.length
+      ? currentQuestion.tests.map((t, i) => ({ input: t.stdin, expectedOutput: t.expected, description: `Test ${i + 1}` }))
+      : TEST_CASES[testCaseKey] || [];
 
     if (tests.length === 0) {
       setTestResults([{ passed: false, input: "", expected: "", actual: "No test cases defined for this question", description: "N/A" }]);
@@ -465,7 +472,7 @@ export default function Interview() {
         const actual = (result.run?.stdout || result.run?.stderr || "").trim();
         const expected = test.expectedOutput.trim();
         
-        const passed = actual.includes(expected) || actual === expected || normalizeOutput(actual) === normalizeOutput(expected);
+        const passed = normalizeOutput(actual) === normalizeOutput(expected);
 
         results.push({ passed, input: test.input, expected: expected, actual: actual, description: test.description });
       } catch (err) {
@@ -489,6 +496,13 @@ export default function Interview() {
     };
     
     setQuestionAttempts(prev => [...prev, attempt]);
+
+    // Feed the Skill Scoring Engine (Eq. 1 inputs: correctness and solve time).
+    engine.logAttempt({
+      topic, difficulty: currentQuestion.difficulty || "medium",
+      testsPassed: passedCount, testsTotal: results.length,
+      timeMs: Date.now() - questionStart.current, source: "technical-dashboard",
+    }).catch((e) => console.warn("engine log failed:", e));
     
     setShowTestResults(true);
     setIsTesting(false);
@@ -523,6 +537,7 @@ export default function Interview() {
       return;
     }
     setIndex((i) => i + 1);
+    questionStart.current = Date.now();
     setStdout("");
     setStderr("");
     setTestResults([]);
@@ -764,7 +779,16 @@ export default function Interview() {
                 <span className="text-xs text-muted-foreground font-mono">📝 Code Editor</span>
                 <span className="text-xs text-foreground font-mono">{language.toUpperCase()}</span>
               </div>
-              <textarea value={code} onChange={(e) => setCode(e.target.value)} className="w-full h-96 bg-muted text-foreground font-mono text-sm p-4 rounded-md outline-none resize-none border focus:ring-2 focus:ring-ring" spellCheck={false} placeholder="Write your code here..." />
+              <div className="h-96 rounded-md overflow-hidden border">
+                <Editor
+                  height="100%"
+                  language={language === "cpp" ? "cpp" : language}
+                  value={code}
+                  onChange={(v) => setCode(v ?? "")}
+                  theme="vs-dark"
+                  options={{ fontSize: 14, minimap: { enabled: false }, scrollBeyondLastLine: false, automaticLayout: true, tabSize: 4 }}
+                />
+              </div>
             </div>
 
            {showMockScore && (

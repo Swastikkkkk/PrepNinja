@@ -2,6 +2,7 @@
 // HireVue-style interview server using Cloudinary and local JSON storage.
 
 import resumeCheckRouter from './resume-check.js';
+import engineRouter from './engine/routes.mjs';
 import express from 'express';
 import cors from 'cors';
 import multer from 'multer';
@@ -19,6 +20,9 @@ app.use(bodyParser.json({ limit: '20mb' }));
 
 // Add resume check router
 app.use('/api', resumeCheckRouter);
+
+// Skill Scoring Engine (topic scores, success probability, adaptive roadmap)
+app.use('/api/engine', engineRouter);
 
 // ----------------------------
 // CONFIG

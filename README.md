@@ -1,8 +1,8 @@
-# PrepView
+# PrepNinja
 
 **AI-powered mock interview & job-prep platform**
 
-PrepView helps candidates prepare for both non-technical and technical interviews in one place: proctored AI mock interviews with video answers and automated scoring, a DSA/coding practice round with an in-browser code runner, and an ATS resume analyzer — all backed by Google Gemini.
+PrepNinja helps candidates prepare for both non-technical and technical interviews in one place: proctored AI mock interviews with video answers and automated scoring, a DSA/coding practice round with an in-browser code runner, and an ATS resume analyzer — all backed by Google Gemini.
 
 ## Features
 
@@ -14,7 +14,8 @@ PrepView helps candidates prepare for both non-technical and technical interview
 
 ### 💻 Technical interview / coding practice
 - Gemini generates topic-specific coding problems (arrays, linked lists, trees, graphs, dynamic programming, etc.).
-- In-browser code editor with an execution backend (via the [Piston](https://github.com/engineer-man/piston) API) to run and evaluate submitted code.
+- Monaco code editor. Code runs on [Judge0](https://judge0.com) when `JUDGE0_URL` is set, with the public [Piston](https://github.com/engineer-man/piston) API as fallback.
+- Each generated problem ships with test cases that are kept only if Gemini's own reference solution passes them in the sandbox.
 - Text-to-speech narration of questions via Murf AI.
 - Same webcam/fullscreen/tab-switch proctoring as the behavioral round.
 
@@ -22,15 +23,27 @@ PrepView helps candidates prepare for both non-technical and technical interview
 - Upload a PDF/DOC/DOCX resume.
 - Gemini returns an ATS score (0–100), strengths, weaknesses, and specific, actionable improvement tips.
 
+### 📈 Skill Scoring Engine and adaptive roadmap
+- Every coding attempt updates a per-topic Topic Score from accuracy, solve speed and recency (Eq. 1).
+- Topic scores roll up into a company-weighted readiness index (Eq. 2). Company topic weights are built from public company-tagged interview problems for 52 companies (`research/company_weights`).
+- A roadmap orders non-mastered topics by priority (Eq. 3) under a prerequisite graph and packs them into weekly study blocks sized to the user's daily hours.
+- Scoring modes: `tuned` (default, weights chosen by the offline benchmark), `paper` (original hand-set weights) or `bkt` (Bayesian Knowledge Tracing).
+- Dashboard at `/dashboard`; data can be deleted from the dashboard (`DELETE /api/engine/user/:uid`).
+
+### 🔬 Research artefacts (`research/`)
+- `benchmark/`: offline comparison of Eq. 1 with PFA, BKT and DKT on ASSISTments 2017 (5-fold, learner-level split).
+- `company_weights/`: script that builds W(t, c) from company-tagged problem lists.
+- `llm_consistency.mjs`: repeats identical resumes through the ATS analyser to measure score variance.
+
 ### 🛠️ Admin
 - A basic admin view to list recorded interview attempts and their scores/transcripts.
 
 ## Architecture
 
-PrepView is a monorepo with **one frontend** and **two backend services**:
+PrepNinja is a monorepo with **one frontend** and **two backend services**:
 
 ```
-PrepView/
+PrepNinja/
 ├── frontend/                  # React + TypeScript + Vite app
 │   └── src/
 │       ├── HomePage.tsx           # landing page ("/")
@@ -56,9 +69,9 @@ PrepView/
 
 ## Tech stack
 
-**Frontend:** React 19, TypeScript, Vite 7, React Router, Tailwind CSS 4, shadcn/ui + Radix primitives, Framer Motion, Lucide icons
+**Frontend:** React 19, TypeScript, Vite 7, React Router, Tailwind CSS 4, shadcn/ui + Radix primitives, Monaco Editor, Framer Motion, Lucide icons
 
-**Backends:** Node.js, Express, Multer (file uploads), Cloudinary (video storage), Google Generative AI SDK (Gemini), Deepgram API (speech-to-text), Murf AI (text-to-speech), Piston API (sandboxed code execution), nanoid, fs-extra
+**Backends:** Node.js, Express, Multer (file uploads), Cloudinary (video storage), Google Generative AI SDK (Gemini), Deepgram API (speech-to-text), Murf AI (text-to-speech), Judge0 / Piston (sandboxed code execution), optional Cloud Firestore (firebase-admin), nanoid, fs-extra
 
 ## Getting started
 
@@ -87,16 +100,21 @@ CLOUDINARY_API_SECRET=your_api_secret_here
 GEMINI_API_KEY=your_gemini_api_key_here
 DEEPGRAM_API_KEY=your_deepgram_api_key_here
 PORT=8080
+# optional, see backend/.env.example
+JUDGE0_URL=
+SCORING_MODE=tuned
+FIREBASE_SERVICE_ACCOUNT=
 ```
 
-Run it:
+Run it (and the engine's unit tests):
 ```bash
 node server.js
+npm test
 ```
 
 ### 2. Backend — Code API (`backend/info.js`)
 
-This is a second, separate Express server (still inside `backend/`) that powers the technical/coding round. It uses the same `GEMINI_API_KEY` from your `.env` and needs no extra credentials (code execution uses the public Piston API).
+This is a second, separate Express server (still inside `backend/`) that powers the technical/coding round. It uses the same `GEMINI_API_KEY` from your `.env`. Code runs on Judge0 if `JUDGE0_URL` is set (self-host with the [Judge0 CE docker-compose](https://github.com/judge0/judge0/blob/master/CHANGELOG.md#deployment-procedure)), otherwise on the public Piston API.
 
 ```bash
 # from the backend/ folder, with the same .env in place

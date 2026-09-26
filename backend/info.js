@@ -73,11 +73,19 @@ REQUIREMENTS:
 - AVOID generic or vague questions
 - Add constraints and edge cases to make questions specific
 
+INPUT/OUTPUT CONTRACT:
+- Every question reads ALL input from standard input and prints the answer to standard output.
+- Describe the exact input format and output format inside the question text.
+- Provide 4 test cases (stdin and exact expected stdout) including at least one edge case.
+- Provide a correct reference solution in Python 3 that reads stdin and prints stdout.
+
 RESPONSE FORMAT (JSON ONLY, NO MARKDOWN):
 {
   "questions": [
-    {"id": 1, "text": "Question 1: [Specific problem statement with clear requirements, constraints, and complexity hints]"},
-    {"id": 2, "text": "Question 2: [Specific problem statement with clear requirements, constraints, and complexity hints]"}
+    {"id": 1, "difficulty": "medium", "text": "Question 1: [problem statement, input format, output format, constraints]",
+     "tests": [{"stdin": "...", "expected": "..."}],
+     "reference": "python 3 source code"},
+    {"id": 2, "difficulty": "hard", "text": "...", "tests": [...], "reference": "..."}
   ]
 }
 
@@ -132,9 +140,28 @@ Generate ONLY valid JSON. Do NOT include markdown code blocks or any other text.
       });
     }
 
-    console.log(`✅ Successfully generated ${parsed.questions.length} questions for ${topics}`);
-    
-    return res.json(parsed);
+    // Safeguard: keep only test cases that the model's own reference solution passes
+    // in the sandbox, so generated problems cannot ship with wrong expected outputs.
+    const checked = [];
+    for (const q of parsed.questions) {
+      const tests = Array.isArray(q.tests) ? q.tests.slice(0, 8) : [];
+      const valid = [];
+      if (q.reference) {
+        for (const t of tests) {
+          try {
+            const out = await execute("python", q.reference, String(t.stdin ?? ""));
+            if (sameOutput(out.stdout, String(t.expected ?? ""))) valid.push({ stdin: String(t.stdin ?? ""), expected: String(t.expected ?? "").trim() });
+          } catch (e) { console.warn("reference run failed:", e.message); }
+        }
+      }
+      checked.push({
+        id: q.id, text: q.text,
+        difficulty: ["easy", "medium", "hard"].includes(q.difficulty) ? q.difficulty : "medium",
+        tests: valid, testsGenerated: tests.length, validated: valid.length >= 2,
+      });
+    }
+    console.log(`✅ Generated ${checked.length} questions for ${topics}; validated tests: ${checked.map((q) => `${q.tests.length}/${q.testsGenerated}`).join(", ")}`);
+    return res.json({ questions: checked });
 
   } catch (err) {
     console.error("❌ Gemini API Error:", err && err.message ? err.message : err);
@@ -255,6 +282,65 @@ Generate ONLY valid JSON. Do NOT include markdown code blocks.`;
   }
 });
 
+// ---------- Judge0 (preferred when JUDGE0_URL is set) ----------
+// Self-hosted Judge0 CE: JUDGE0_URL=http://localhost:2358
+// RapidAPI:             JUDGE0_URL=https://judge0-ce.p.rapidapi.com  JUDGE0_KEY=<key>
+const JUDGE0_URL = process.env.JUDGE0_URL;
+const JUDGE0_KEY = process.env.JUDGE0_KEY;
+const JUDGE0_LANG = { python: 71, java: 62, cpp: 54, "c++": 54, javascript: 63, c: 50 };
+
+async function runJudge0(language, code, stdin) {
+  const id = JUDGE0_LANG[language.toLowerCase()];
+  if (!id) throw new Error(`Unsupported language for Judge0: ${language}`);
+  const headers = { "Content-Type": "application/json" };
+  if (JUDGE0_KEY) {
+    headers["X-RapidAPI-Key"] = JUDGE0_KEY;
+    headers["X-RapidAPI-Host"] = new URL(JUDGE0_URL).host;
+  }
+  const r = await fetch(`${JUDGE0_URL}/submissions?base64_encoded=false&wait=true`, {
+    method: "POST", headers,
+    body: JSON.stringify({ language_id: id, source_code: code, stdin: stdin || "", cpu_time_limit: 5, memory_limit: 256000 }),
+  });
+  if (!r.ok) throw new Error(`Judge0 error ${r.status}: ${await r.text()}`);
+  const j = await r.json();
+  const stdout = j.stdout || "", stderr = j.stderr || "";
+  // Same shape the frontend already reads from Piston, plus execution metrics.
+  return {
+    language, engine: "judge0",
+    compile: j.compile_output ? { stderr: j.compile_output, code: 1 } : undefined,
+    run: { stdout, stderr, output: stdout + stderr, code: j.status?.id === 3 ? 0 : 1 },
+    metrics: { status: j.status?.description, timeMs: j.time ? Math.round(parseFloat(j.time) * 1000) : null, memoryKb: j.memory ?? null },
+  };
+}
+// ----------------------------------------------------------------
+
+const PISTON_LANG = {
+  python: { language: "python", version: "3.10.0", filename: "main.py" },
+  java: { language: "java", version: "15.0.2", filename: "Main.java" },
+  cpp: { language: "cpp", version: "10.2.0", filename: "main.cpp" },
+  "c++": { language: "cpp", version: "10.2.0", filename: "main.cpp" },
+  javascript: { language: "javascript", version: "15.10.6", filename: "main.js" },
+};
+
+// Runs code on Judge0 when configured, otherwise Piston. Returns { stdout, stderr, metrics }.
+async function execute(language, code, stdin) {
+  if (JUDGE0_URL) {
+    const j = await runJudge0(language, code, stdin);
+    return { stdout: j.run.stdout, stderr: j.run.stderr || j.compile?.stderr || "", metrics: j.metrics };
+  }
+  const rt = PISTON_LANG[language.toLowerCase()];
+  const r = await fetch(PISTON_ENDPOINTS[0], {
+    method: "POST", headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ language: rt.language, version: rt.version, files: [{ name: rt.filename, content: code }], stdin }),
+  });
+  if (!r.ok) throw new Error(`Piston error ${r.status}`);
+  const o = await r.json();
+  return { stdout: o.run?.stdout || "", stderr: o.run?.stderr || o.compile?.stderr || "", metrics: null };
+}
+
+const norm = (x) => String(x).replace(/\r/g, "").trim().split("\n").map((l) => l.trim().replace(/\s+/g, " ")).join("\n");
+const sameOutput = (a, b) => norm(a) === norm(b);
+
 /**
  * POST /api/compile
  * Body: { language: "python"|"java"|"cpp", code: string, stdin?: string }
@@ -266,6 +352,14 @@ app.post("/api/compile", async (req, res) => {
     
     if (!language || !code) {
       return res.status(400).json({ error: "Missing language or code" });
+    }
+
+    if (JUDGE0_URL) {
+      try {
+        return res.json(await runJudge0(language, code, stdin));
+      } catch (e) {
+        console.error("Judge0 failed, falling back to Piston:", e.message);
+      }
     }
 
    const langMap = {

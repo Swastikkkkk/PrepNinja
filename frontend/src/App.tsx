@@ -5,6 +5,7 @@ import Interview from "./Interview";
 import InterviewSet from "./InterviewSet";
 import HomePage from "./HomePage";
 import ATSChecker from "./ATSChecker";
+import Dashboard from "./Dashboard";
 
 
 export default function App() {
@@ -22,6 +23,9 @@ export default function App() {
         <Route path="/interview-flow" element={<InterviewFlow apiBase={API_BASE} />} />
         <Route path="/interview-set" element={<InterviewSet />} />
         
+        {/* Skill Scoring Engine dashboard */}
+        <Route path="/dashboard" element={<Dashboard />} />
+
         {/* ATS Checker Route */}
         <Route path="/ats-checker" element={<ATSChecker />} />
         

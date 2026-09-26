@@ -43,3 +43,8 @@ lerna-debug.log*
 
 # OS files
 Thumbs.db
+
+# engine local store
+backend/engine-data.json
+backend/uploads/*
+!backend/uploads/.gitkeep
