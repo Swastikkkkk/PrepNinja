@@ -13,6 +13,8 @@ app.use(express.json({ limit: "1mb" }));
 
 // ---------- CONFIG ----------
 const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
+// Model is configurable because Google retires model versions for new keys.
+const GEMINI_MODEL = process.env.GEMINI_MODEL || "gemini-flash-latest";
 
 if (!GEMINI_API_KEY) {
   console.error("ERROR: GEMINI_API_KEY not found in environment variables!");
@@ -94,7 +96,7 @@ Generate ONLY valid JSON. Do NOT include markdown code blocks or any other text.
   try {
     console.log(`🔍 Generating questions for Topic: ${topics}, Role: ${role}`);
     
-    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${GEMINI_API_KEY}`;
+    const url = `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent?key=${GEMINI_API_KEY}`;
 
     const r = await fetch(url, {
       method: "POST",
@@ -231,7 +233,7 @@ Generate ONLY valid JSON. Do NOT include markdown code blocks.`;
   try {
     console.log(`🔍 Evaluating code for question in ${language}...`);
     
-    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${GEMINI_API_KEY}`;
+    const url = `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent?key=${GEMINI_API_KEY}`;
 
     const r = await fetch(url, {
       method: "POST",

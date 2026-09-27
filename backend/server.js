@@ -32,6 +32,8 @@ const CLOUDINARY_API_KEY = process.env.CLOUDINARY_API_KEY;
 const CLOUDINARY_API_SECRET = process.env.CLOUDINARY_API_SECRET;
 
 const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
+// Model is configurable because Google retires model versions for new keys.
+const GEMINI_MODEL = process.env.GEMINI_MODEL || "gemini-flash-latest";
 const DEEPGRAM_API_KEY = process.env.DEEPGRAM_API_KEY;
 
 const PORT = process.env.PORT || 8080;
@@ -87,7 +89,7 @@ async function saveAttemptMetadata(meta) {
 // ----------------------------
 // Gemini helper (REST generateContent)
 // ----------------------------
-async function callGemini(promptText, model = "gemini-2.5-flash") {
+async function callGemini(promptText, model = GEMINI_MODEL) {
   if (!GEMINI_API_KEY) {
     throw new Error("GEMINI_API_KEY not set in server.js");
   }

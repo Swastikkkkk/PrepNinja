@@ -54,7 +54,7 @@ const ATS_WEIGHTS = {
   achievement_quantification: 15,
   action_verbs: 10,
 };
-const ATS_MODEL = process.env.ATS_MODEL || 'gemini-2.5-flash';
+const ATS_MODEL = process.env.ATS_MODEL || process.env.GEMINI_MODEL || 'gemini-flash-latest';
 
 // ATS Analysis Endpoint
 router.post('/analyze-resume', upload.single('file'), async (req, res) => {
