@@ -1,0 +1,650 @@
+[
+ {
+  "topic": "arrays",
+  "run": 0,
+  "model": "gemini-3.8-flash",
+  "difficulty": "medium",
+  "tests": 4,
+  "passed": 4,
+  "ref_errors": 0
+ },
+ {
+  "topic": "arrays",
+  "run": 0,
+  "model": "gemini-3.8-flash",
+  "difficulty": "hard",
+  "tests": 4,
+  "passed": 4,
+  "ref_errors": 0
+ },
+ {
+  "topic": "arrays",
+  "run": 1,
+  "model": "gemini-3.8-flash",
+  "difficulty": "medium",
+  "tests": 4,
+  "passed": 3,
+  "ref_errors": 0
+ },
+ {
+  "topic": "arrays",
+  "run": 1,
+  "model": "gemini-3.8-flash",
+  "difficulty": "hard",
+  "tests": 4,
+  "passed": 4,
+  "ref_errors": 0
+ },
+ {
+  "topic": "arrays",
+  "run": 2,
+  "model": "gemini-3.8-flash",
+  "difficulty": "medium",
+  "tests": 4,
+  "passed": 4,
+  "ref_errors": 0
+ },
+ {
+  "topic": "arrays",
+  "run": 2,
+  "model": "gemini-3.8-flash",
+  "difficulty": "hard",
+  "tests": 4,
+  "passed": 4,
+  "ref_errors": 0
+ },
+ {
+  "topic": "linked-lists",
+  "run": 0,
+  "model": "gemini-3.8-flash",
+  "difficulty": "medium",
+  "tests": 4,
+  "passed": 4,
+  "ref_errors": 0
+ },
+ {
+  "topic": "linked-lists",
+  "run": 0,
+  "model": "gemini-3.8-flash",
+  "difficulty": "hard",
+  "tests": 4,
+  "passed": 4,
+  "ref_errors": 0
+ },
+ {
+  "topic": "linked-lists",
+  "run": 1,
+  "model": "gemini-3.8-flash",
+  "difficulty": "medium",
+  "tests": 4,
+  "passed": 4,
+  "ref_errors": 0
+ },
+ {
+  "topic": "linked-lists",
+  "run": 1,
+  "model": "gemini-3.8-flash",
+  "difficulty": "hard",
+  "tests": 4,
+  "passed": 4,
+  "ref_errors": 0
+ },
+ {
+  "topic": "linked-lists",
+  "run": 2,
+  "model": "gemini-3.8-flash",
+  "difficulty": "medium",
+  "tests": 4,
+  "passed": 4,
+  "ref_errors": 0
+ },
+ {
+  "topic": "linked-lists",
+  "run": 2,
+  "model": "gemini-3.8-flash",
+  "difficulty": "hard",
+  "tests": 4,
+  "passed": 4,
+  "ref_errors": 0
+ },
+ {
+  "topic": "stacks",
+  "run": 0,
+  "model": "gemini-3.8-flash",
+  "difficulty": "medium",
+  "tests": 4,
+  "passed": 4,
+  "ref_errors": 0
+ },
+ {
+  "topic": "stacks",
+  "run": 0,
+  "model": "gemini-3.8-flash",
+  "difficulty": "hard",
+  "tests": 4,
+  "passed": 4,
+  "ref_errors": 0
+ },
+ {
+  "topic": "stacks",
+  "run": 1,
+  "model": "gemini-3.8-flash",
+  "difficulty": "medium",
+  "tests": 4,
+  "passed": 4,
+  "ref_errors": 0
+ },
+ {
+  "topic": "stacks",
+  "run": 1,
+  "model": "gemini-3.8-flash",
+  "difficulty": "hard",
+  "tests": 4,
+  "passed": 4,
+  "ref_errors": 0
+ },
+ {
+  "topic": "stacks",
+  "run": 2,
+  "model": "gemini-3.8-flash",
+  "difficulty": "medium",
+  "tests": 4,
+  "passed": 3,
+  "ref_errors": 0
+ },
+ {
+  "topic": "stacks",
+  "run": 2,
+  "model": "gemini-3.8-flash",
+  "difficulty": "hard",
+  "tests": 4,
+  "passed": 4,
+  "ref_errors": 0
+ },
+ {
+  "topic": "queues",
+  "run": 0,
+  "model": "gemini-3.8-flash",
+  "difficulty": "medium",
+  "tests": 4,
+  "passed": 4,
+  "ref_errors": 0
+ },
+ {
+  "topic": "queues",
+  "run": 0,
+  "model": "gemini-3.8-flash",
+  "difficulty": "hard",
+  "tests": 4,
+  "passed": 4,
+  "ref_errors": 0
+ },
+ {
+  "topic": "queues",
+  "run": 1,
+  "model": "gemini-3.8-flash",
+  "difficulty": "medium",
+  "tests": 4,
+  "passed": 4,
+  "ref_errors": 0
+ },
+ {
+  "topic": "queues",
+  "run": 1,
+  "model": "gemini-3.8-flash",
+  "difficulty": "hard",
+  "tests": 4,
+  "passed": 4,
+  "ref_errors": 0
+ },
+ {
+  "topic": "queues",
+  "run": 2,
+  "model": "gemini-3.8-flash",
+  "difficulty": "medium",
+  "tests": 4,
+  "passed": 4,
+  "ref_errors": 0
+ },
+ {
+  "topic": "queues",
+  "run": 2,
+  "model": "gemini-3.8-flash",
+  "difficulty": "hard",
+  "tests": 4,
+  "passed": 4,
+  "ref_errors": 0
+ },
+ {
+  "topic": "trees",
+  "run": 0,
+  "model": "gemini-3.8-flash",
+  "difficulty": "medium",
+  "tests": 4,
+  "passed": 4,
+  "ref_errors": 0
+ },
+ {
+  "topic": "trees",
+  "run": 0,
+  "model": "gemini-3.8-flash",
+  "difficulty": "hard",
+  "tests": 4,
+  "passed": 4,
+  "ref_errors": 0
+ },
+ {
+  "topic": "trees",
+  "run": 1,
+  "model": "gemini-3.8-flash",
+  "difficulty": "medium",
+  "tests": 4,
+  "passed": 4,
+  "ref_errors": 0
+ },
+ {
+  "topic": "trees",
+  "run": 1,
+  "model": "gemini-3.8-flash",
+  "difficulty": "hard",
+  "tests": 4,
+  "passed": 4,
+  "ref_errors": 0
+ },
+ {
+  "topic": "trees",
+  "run": 2,
+  "model": "gemini-3.8-flash",
+  "difficulty": "medium",
+  "tests": 4,
+  "passed": 4,
+  "ref_errors": 0
+ },
+ {
+  "topic": "trees",
+  "run": 2,
+  "model": "gemini-3.8-flash",
+  "difficulty": "hard",
+  "tests": 4,
+  "passed": 4,
+  "ref_errors": 0
+ },
+ {
+  "topic": "graphs",
+  "run": 0,
+  "model": "gemini-3.8-flash",
+  "difficulty": "medium",
+  "tests": 4,
+  "passed": 4,
+  "ref_errors": 0
+ },
+ {
+  "topic": "graphs",
+  "run": 0,
+  "model": "gemini-3.8-flash",
+  "difficulty": "hard",
+  "tests": 4,
+  "passed": 4,
+  "ref_errors": 0
+ },
+ {
+  "topic": "graphs",
+  "run": 1,
+  "model": "gemini-3.8-flash",
+  "difficulty": "medium",
+  "tests": 4,
+  "passed": 4,
+  "ref_errors": 0
+ },
+ {
+  "topic": "graphs",
+  "run": 1,
+  "model": "gemini-3.8-flash",
+  "difficulty": "hard",
+  "tests": 4,
+  "passed": 4,
+  "ref_errors": 0
+ },
+ {
+  "topic": "graphs",
+  "run": 2,
+  "model": "gemini-3.8-flash",
+  "difficulty": "medium",
+  "tests": 4,
+  "passed": 4,
+  "ref_errors": 0
+ },
+ {
+  "topic": "graphs",
+  "run": 2,
+  "model": "gemini-3.8-flash",
+  "difficulty": "hard",
+  "tests": 4,
+  "passed": 4,
+  "ref_errors": 0
+ },
+ {
+  "topic": "hash-tables",
+  "run": 0,
+  "model": "gemini-3.8-flash",
+  "difficulty": "medium",
+  "tests": 4,
+  "passed": 4,
+  "ref_errors": 0
+ },
+ {
+  "topic": "hash-tables",
+  "run": 0,
+  "model": "gemini-3.8-flash",
+  "difficulty": "hard",
+  "tests": 4,
+  "passed": 4,
+  "ref_errors": 0
+ },
+ {
+  "topic": "hash-tables",
+  "run": 1,
+  "model": "gemini-3.8-flash",
+  "difficulty": "medium",
+  "tests": 4,
+  "passed": 4,
+  "ref_errors": 0
+ },
+ {
+  "topic": "hash-tables",
+  "run": 1,
+  "model": "gemini-3.8-flash",
+  "difficulty": "hard",
+  "tests": 4,
+  "passed": 4,
+  "ref_errors": 0
+ },
+ {
+  "topic": "hash-tables",
+  "run": 2,
+  "model": "gemini-3.8-flash",
+  "difficulty": "medium",
+  "tests": 4,
+  "passed": 4,
+  "ref_errors": 0
+ },
+ {
+  "topic": "hash-tables",
+  "run": 2,
+  "model": "gemini-3.8-flash",
+  "difficulty": "hard",
+  "tests": 4,
+  "passed": 4,
+  "ref_errors": 0
+ },
+ {
+  "topic": "heaps",
+  "run": 0,
+  "model": "gemini-3.8-flash",
+  "difficulty": "medium",
+  "tests": 4,
+  "passed": 4,
+  "ref_errors": 0
+ },
+ {
+  "topic": "heaps",
+  "run": 0,
+  "model": "gemini-3.8-flash",
+  "difficulty": "hard",
+  "tests": 4,
+  "passed": 4,
+  "ref_errors": 0
+ },
+ {
+  "topic": "heaps",
+  "run": 1,
+  "model": "gemini-3.8-flash",
+  "difficulty": "medium",
+  "tests": 4,
+  "passed": 3,
+  "ref_errors": 0
+ },
+ {
+  "topic": "heaps",
+  "run": 1,
+  "model": "gemini-3.8-flash",
+  "difficulty": "hard",
+  "tests": 4,
+  "passed": 2,
+  "ref_errors": 2
+ },
+ {
+  "topic": "heaps",
+  "run": 2,
+  "model": "gemini-3.8-flash",
+  "difficulty": "medium",
+  "tests": 4,
+  "passed": 4,
+  "ref_errors": 0
+ },
+ {
+  "topic": "heaps",
+  "run": 2,
+  "model": "gemini-3.8-flash",
+  "difficulty": "hard",
+  "tests": 4,
+  "passed": 2,
+  "ref_errors": 2
+ },
+ {
+  "topic": "sorting",
+  "run": 0,
+  "model": "gemini-3.8-flash",
+  "difficulty": "medium",
+  "tests": 4,
+  "passed": 4,
+  "ref_errors": 0
+ },
+ {
+  "topic": "sorting",
+  "run": 0,
+  "model": "gemini-3.8-flash",
+  "difficulty": "hard",
+  "tests": 4,
+  "passed": 4,
+  "ref_errors": 0
+ },
+ {
+  "topic": "sorting",
+  "run": 1,
+  "model": "gemini-3.8-flash",
+  "difficulty": "medium",
+  "tests": 4,
+  "passed": 4,
+  "ref_errors": 0
+ },
+ {
+  "topic": "sorting",
+  "run": 1,
+  "model": "gemini-3.8-flash",
+  "difficulty": "hard",
+  "tests": 4,
+  "passed": 4,
+  "ref_errors": 0
+ },
+ {
+  "topic": "sorting",
+  "run": 2,
+  "model": "gemini-3.8-flash",
+  "difficulty": "medium",
+  "tests": 4,
+  "passed": 4,
+  "ref_errors": 0
+ },
+ {
+  "topic": "sorting",
+  "run": 2,
+  "model": "gemini-3.8-flash",
+  "difficulty": "hard",
+  "tests": 4,
+  "passed": 4,
+  "ref_errors": 0
+ },
+ {
+  "topic": "recursion",
+  "run": 0,
+  "model": "gemini-3.8-flash",
+  "difficulty": "medium",
+  "tests": 4,
+  "passed": 4,
+  "ref_errors": 0
+ },
+ {
+  "topic": "recursion",
+  "run": 0,
+  "model": "gemini-3.8-flash",
+  "difficulty": "hard",
+  "tests": 4,
+  "passed": 0,
+  "ref_errors": 4
+ },
+ {
+  "topic": "recursion",
+  "run": 1,
+  "model": "gemini-3.8-flash",
+  "difficulty": "medium",
+  "tests": 4,
+  "passed": 4,
+  "ref_errors": 0
+ },
+ {
+  "topic": "recursion",
+  "run": 1,
+  "model": "gemini-3.8-flash",
+  "difficulty": "hard",
+  "tests": 4,
+  "passed": 4,
+  "ref_errors": 0
+ },
+ {
+  "topic": "recursion",
+  "run": 2,
+  "model": "gemini-3.8-flash",
+  "difficulty": "medium",
+  "tests": 4,
+  "passed": 4,
+  "ref_errors": 0
+ },
+ {
+  "topic": "recursion",
+  "run": 2,
+  "model": "gemini-3.8-flash",
+  "difficulty": "hard",
+  "tests": 4,
+  "passed": 4,
+  "ref_errors": 0
+ },
+ {
+  "topic": "dynamic-programming",
+  "run": 0,
+  "model": "gemini-3.8-flash",
+  "difficulty": "medium",
+  "tests": 4,
+  "passed": 4,
+  "ref_errors": 0
+ },
+ {
+  "topic": "dynamic-programming",
+  "run": 0,
+  "model": "gemini-3.8-flash",
+  "difficulty": "hard",
+  "tests": 4,
+  "passed": 4,
+  "ref_errors": 0
+ },
+ {
+  "topic": "dynamic-programming",
+  "run": 1,
+  "model": "gemini-3.8-flash",
+  "difficulty": "medium",
+  "tests": 4,
+  "passed": 4,
+  "ref_errors": 0
+ },
+ {
+  "topic": "dynamic-programming",
+  "run": 1,
+  "model": "gemini-3.8-flash",
+  "difficulty": "hard",
+  "tests": 4,
+  "passed": 4,
+  "ref_errors": 0
+ },
+ {
+  "topic": "dynamic-programming",
+  "run": 2,
+  "model": "gemini-3.8-flash",
+  "difficulty": "medium",
+  "tests": 4,
+  "passed": 4,
+  "ref_errors": 0
+ },
+ {
+  "topic": "dynamic-programming",
+  "run": 2,
+  "model": "gemini-3.8-flash",
+  "difficulty": "hard",
+  "tests": 4,
+  "passed": 4,
+  "ref_errors": 0
+ },
+ {
+  "topic": "strings",
+  "run": 0,
+  "model": "gemini-3.8-flash",
+  "difficulty": "medium",
+  "tests": 4,
+  "passed": 4,
+  "ref_errors": 0
+ },
+ {
+  "topic": "strings",
+  "run": 0,
+  "model": "gemini-3.8-flash",
+  "difficulty": "hard",
+  "tests": 4,
+  "passed": 3,
+  "ref_errors": 0
+ },
+ {
+  "topic": "strings",
+  "run": 1,
+  "model": "gemini-3.8-flash",
+  "difficulty": "medium",
+  "tests": 4,
+  "passed": 3,
+  "ref_errors": 0
+ },
+ {
+  "topic": "strings",
+  "run": 1,
+  "model": "gemini-3.8-flash",
+  "difficulty": "hard",
+  "tests": 4,
+  "passed": 4,
+  "ref_errors": 0
+ },
+ {
+  "topic": "strings",
+  "run": 2,
+  "model": "gemini-3.8-flash",
+  "difficulty": "medium",
+  "tests": 4,
+  "passed": 4,
+  "ref_errors": 0
+ },
+ {
+  "topic": "strings",
+  "run": 2,
+  "model": "gemini-3.8-flash",
+  "difficulty": "hard",
+  "tests": 4,
+  "passed": 4,
+  "ref_errors": 0
+ }
+]

@@ -1,0 +1,1222 @@
+[
+ {
+  "exp": "repeat",
+  "file": "R1_strong.pdf",
+  "role": "SDE-1 Backend Engineer",
+  "run": 0,
+  "score": 90,
+  "breakdown": {
+   "keyword_coverage": 29.8,
+   "section_completeness": 18,
+   "formatting_compliance": 19.6,
+   "achievement_quantification": 14.3,
+   "action_verbs": 8.2
+  },
+  "nFound": 19,
+  "nMissing": 8
+ },
+ {
+  "exp": "repeat",
+  "file": "R1_strong.pdf",
+  "role": "SDE-1 Backend Engineer",
+  "run": 1,
+  "score": 93,
+  "breakdown": {
+   "keyword_coverage": 29.8,
+   "section_completeness": 20,
+   "formatting_compliance": 20,
+   "achievement_quantification": 15,
+   "action_verbs": 8.5
+  },
+  "nFound": 18,
+  "nMissing": 11
+ },
+ {
+  "exp": "repeat",
+  "file": "R1_strong.pdf",
+  "role": "SDE-1 Backend Engineer",
+  "run": 2,
+  "score": 93,
+  "breakdown": {
+   "keyword_coverage": 29.8,
+   "section_completeness": 20,
+   "formatting_compliance": 20,
+   "achievement_quantification": 14.3,
+   "action_verbs": 8.5
+  },
+  "nFound": 18,
+  "nMissing": 8
+ },
+ {
+  "exp": "repeat",
+  "file": "R1_strong.pdf",
+  "role": "SDE-1 Backend Engineer",
+  "run": 3,
+  "score": 91,
+  "breakdown": {
+   "keyword_coverage": 28.7,
+   "section_completeness": 19,
+   "formatting_compliance": 20,
+   "achievement_quantification": 15,
+   "action_verbs": 8.2
+  },
+  "nFound": 17,
+  "nMissing": 8
+ },
+ {
+  "exp": "repeat",
+  "file": "R1_strong.pdf",
+  "role": "SDE-1 Backend Engineer",
+  "run": 4,
+  "score": 90,
+  "breakdown": {
+   "keyword_coverage": 28.7,
+   "section_completeness": 19,
+   "formatting_compliance": 19.6,
+   "achievement_quantification": 14.7,
+   "action_verbs": 7.8
+  },
+  "nFound": 22,
+  "nMissing": 10
+ },
+ {
+  "exp": "repeat",
+  "file": "R1_strong.pdf",
+  "role": "SDE-1 Backend Engineer",
+  "run": 5,
+  "score": 92,
+  "breakdown": {
+   "keyword_coverage": 29.4,
+   "section_completeness": 20,
+   "formatting_compliance": 20,
+   "achievement_quantification": 14.3,
+   "action_verbs": 8.5
+  },
+  "nFound": 20,
+  "nMissing": 8
+ },
+ {
+  "exp": "repeat",
+  "file": "R1_strong.pdf",
+  "role": "SDE-1 Backend Engineer",
+  "run": 6,
+  "score": 93,
+  "breakdown": {
+   "keyword_coverage": 30.1,
+   "section_completeness": 20,
+   "formatting_compliance": 19.6,
+   "achievement_quantification": 14.7,
+   "action_verbs": 8.4
+  },
+  "nFound": 21,
+  "nMissing": 8
+ },
+ {
+  "exp": "repeat",
+  "file": "R1_strong.pdf",
+  "role": "SDE-1 Backend Engineer",
+  "run": 7,
+  "score": 92,
+  "breakdown": {
+   "keyword_coverage": 29.8,
+   "section_completeness": 19,
+   "formatting_compliance": 20,
+   "achievement_quantification": 14.3,
+   "action_verbs": 8.8
+  },
+  "nFound": 17,
+  "nMissing": 11
+ },
+ {
+  "exp": "repeat",
+  "file": "R1_strong.pdf",
+  "role": "SDE-1 Backend Engineer",
+  "run": 8,
+  "score": 92,
+  "breakdown": {
+   "keyword_coverage": 29.8,
+   "section_completeness": 19,
+   "formatting_compliance": 20,
+   "achievement_quantification": 15,
+   "action_verbs": 8.2
+  },
+  "nFound": 18,
+  "nMissing": 8
+ },
+ {
+  "exp": "repeat",
+  "file": "R1_strong.pdf",
+  "role": "SDE-1 Backend Engineer",
+  "run": 9,
+  "score": 92,
+  "breakdown": {
+   "keyword_coverage": 29.8,
+   "section_completeness": 20,
+   "formatting_compliance": 19.6,
+   "achievement_quantification": 14.3,
+   "action_verbs": 8.5
+  },
+  "nFound": 20,
+  "nMissing": 8
+ },
+ {
+  "exp": "repeat",
+  "file": "R2_medium.pdf",
+  "role": "SDE-1 Backend Engineer",
+  "run": 0,
+  "score": 53,
+  "breakdown": {
+   "keyword_coverage": 12.3,
+   "section_completeness": 19,
+   "formatting_compliance": 19,
+   "achievement_quantification": 0,
+   "action_verbs": 3
+  },
+  "nFound": 6,
+  "nMissing": 14
+ },
+ {
+  "exp": "repeat",
+  "file": "R2_medium.pdf",
+  "role": "SDE-1 Backend Engineer",
+  "run": 1,
+  "score": 48,
+  "breakdown": {
+   "keyword_coverage": 10.5,
+   "section_completeness": 16,
+   "formatting_compliance": 19,
+   "achievement_quantification": 0,
+   "action_verbs": 2
+  },
+  "nFound": 6,
+  "nMissing": 12
+ },
+ {
+  "exp": "repeat",
+  "file": "R2_medium.pdf",
+  "role": "SDE-1 Backend Engineer",
+  "run": 2,
+  "score": 48,
+  "breakdown": {
+   "keyword_coverage": 12.3,
+   "section_completeness": 14,
+   "formatting_compliance": 19,
+   "achievement_quantification": 0,
+   "action_verbs": 3
+  },
+  "nFound": 7,
+  "nMissing": 12
+ },
+ {
+  "exp": "repeat",
+  "file": "R2_medium.pdf",
+  "role": "SDE-1 Backend Engineer",
+  "run": 3,
+  "score": 50,
+  "breakdown": {
+   "keyword_coverage": 12.3,
+   "section_completeness": 16,
+   "formatting_compliance": 19,
+   "achievement_quantification": 0,
+   "action_verbs": 3
+  },
+  "nFound": 6,
+  "nMissing": 12
+ },
+ {
+  "exp": "repeat",
+  "file": "R2_medium.pdf",
+  "role": "SDE-1 Backend Engineer",
+  "run": 4,
+  "score": 52,
+  "breakdown": {
+   "keyword_coverage": 12.3,
+   "section_completeness": 18,
+   "formatting_compliance": 19,
+   "achievement_quantification": 0,
+   "action_verbs": 2.5
+  },
+  "nFound": 8,
+  "nMissing": 12
+ },
+ {
+  "exp": "repeat",
+  "file": "R2_medium.pdf",
+  "role": "SDE-1 Backend Engineer",
+  "run": 5,
+  "score": 55,
+  "breakdown": {
+   "keyword_coverage": 13.3,
+   "section_completeness": 19,
+   "formatting_compliance": 19.6,
+   "achievement_quantification": 0,
+   "action_verbs": 3
+  },
+  "nFound": 6,
+  "nMissing": 12
+ },
+ {
+  "exp": "repeat",
+  "file": "R2_medium.pdf",
+  "role": "SDE-1 Backend Engineer",
+  "run": 6,
+  "score": 49,
+  "breakdown": {
+   "keyword_coverage": 10.5,
+   "section_completeness": 17,
+   "formatting_compliance": 19,
+   "achievement_quantification": 0,
+   "action_verbs": 2.5
+  },
+  "nFound": 6,
+  "nMissing": 12
+ },
+ {
+  "exp": "repeat",
+  "file": "R2_medium.pdf",
+  "role": "SDE-1 Backend Engineer",
+  "run": 7,
+  "score": 53,
+  "breakdown": {
+   "keyword_coverage": 12.3,
+   "section_completeness": 19,
+   "formatting_compliance": 19,
+   "achievement_quantification": 0,
+   "action_verbs": 2.5
+  },
+  "nFound": 5,
+  "nMissing": 12
+ },
+ {
+  "exp": "repeat",
+  "file": "R2_medium.pdf",
+  "role": "SDE-1 Backend Engineer",
+  "run": 8,
+  "score": 53,
+  "breakdown": {
+   "keyword_coverage": 12.3,
+   "section_completeness": 17,
+   "formatting_compliance": 19,
+   "achievement_quantification": 0.8,
+   "action_verbs": 3.5
+  },
+  "nFound": 6,
+  "nMissing": 12
+ },
+ {
+  "exp": "repeat",
+  "file": "R2_medium.pdf",
+  "role": "SDE-1 Backend Engineer",
+  "run": 9,
+  "score": 53,
+  "breakdown": {
+   "keyword_coverage": 12.3,
+   "section_completeness": 18,
+   "formatting_compliance": 20,
+   "achievement_quantification": 0,
+   "action_verbs": 3
+  },
+  "nFound": 8,
+  "nMissing": 13
+ },
+ {
+  "exp": "repeat",
+  "file": "R3_weak.pdf",
+  "role": "SDE-1 Backend Engineer",
+  "run": 0,
+  "score": 31,
+  "breakdown": {
+   "keyword_coverage": 2.8,
+   "section_completeness": 8,
+   "formatting_compliance": 19,
+   "achievement_quantification": 0,
+   "action_verbs": 1
+  },
+  "nFound": 2,
+  "nMissing": 15
+ },
+ {
+  "exp": "repeat",
+  "file": "R3_weak.pdf",
+  "role": "SDE-1 Backend Engineer",
+  "run": 1,
+  "score": 30,
+  "breakdown": {
+   "keyword_coverage": 1.8,
+   "section_completeness": 8,
+   "formatting_compliance": 19,
+   "achievement_quantification": 0,
+   "action_verbs": 1
+  },
+  "nFound": 2,
+  "nMissing": 15
+ },
+ {
+  "exp": "repeat",
+  "file": "R3_weak.pdf",
+  "role": "SDE-1 Backend Engineer",
+  "run": 2,
+  "score": 30,
+  "breakdown": {
+   "keyword_coverage": 1.8,
+   "section_completeness": 8,
+   "formatting_compliance": 19,
+   "achievement_quantification": 0,
+   "action_verbs": 1
+  },
+  "nFound": 2,
+  "nMissing": 15
+ },
+ {
+  "exp": "repeat",
+  "file": "R3_weak.pdf",
+  "role": "SDE-1 Backend Engineer",
+  "run": 3,
+  "score": 30,
+  "breakdown": {
+   "keyword_coverage": 1.8,
+   "section_completeness": 8,
+   "formatting_compliance": 19,
+   "achievement_quantification": 0,
+   "action_verbs": 1
+  },
+  "nFound": 1,
+  "nMissing": 16
+ },
+ {
+  "exp": "repeat",
+  "file": "R3_weak.pdf",
+  "role": "SDE-1 Backend Engineer",
+  "run": 4,
+  "score": 29,
+  "breakdown": {
+   "keyword_coverage": 1.8,
+   "section_completeness": 7,
+   "formatting_compliance": 19,
+   "achievement_quantification": 0,
+   "action_verbs": 1
+  },
+  "nFound": 2,
+  "nMissing": 12
+ },
+ {
+  "exp": "repeat",
+  "file": "R3_weak.pdf",
+  "role": "SDE-1 Backend Engineer",
+  "run": 5,
+  "score": 30,
+  "breakdown": {
+   "keyword_coverage": 1.8,
+   "section_completeness": 8,
+   "formatting_compliance": 19,
+   "achievement_quantification": 0,
+   "action_verbs": 1
+  },
+  "nFound": 2,
+  "nMissing": 12
+ },
+ {
+  "exp": "repeat",
+  "file": "R3_weak.pdf",
+  "role": "SDE-1 Backend Engineer",
+  "run": 6,
+  "score": 30,
+  "breakdown": {
+   "keyword_coverage": 1.8,
+   "section_completeness": 8,
+   "formatting_compliance": 19,
+   "achievement_quantification": 0,
+   "action_verbs": 1
+  },
+  "nFound": 2,
+  "nMissing": 14
+ },
+ {
+  "exp": "repeat",
+  "file": "R3_weak.pdf",
+  "role": "SDE-1 Backend Engineer",
+  "run": 7,
+  "score": 29,
+  "breakdown": {
+   "keyword_coverage": 1.8,
+   "section_completeness": 7,
+   "formatting_compliance": 19,
+   "achievement_quantification": 0,
+   "action_verbs": 1
+  },
+  "nFound": 1,
+  "nMissing": 15
+ },
+ {
+  "exp": "repeat",
+  "file": "R3_weak.pdf",
+  "role": "SDE-1 Backend Engineer",
+  "run": 8,
+  "score": 30,
+  "breakdown": {
+   "keyword_coverage": 1.8,
+   "section_completeness": 8,
+   "formatting_compliance": 19,
+   "achievement_quantification": 0,
+   "action_verbs": 1
+  },
+  "nFound": 1,
+  "nMissing": 12
+ },
+ {
+  "exp": "repeat",
+  "file": "R3_weak.pdf",
+  "role": "SDE-1 Backend Engineer",
+  "run": 9,
+  "score": 30,
+  "breakdown": {
+   "keyword_coverage": 1.8,
+   "section_completeness": 8,
+   "formatting_compliance": 19,
+   "achievement_quantification": 0,
+   "action_verbs": 1
+  },
+  "nFound": 2,
+  "nMissing": 14
+ },
+ {
+  "exp": "repeat",
+  "file": "R4_tables.pdf",
+  "role": "SDE-1 Backend Engineer",
+  "run": 0,
+  "score": 63,
+  "breakdown": {
+   "keyword_coverage": 23.8,
+   "section_completeness": 12,
+   "formatting_compliance": 9,
+   "achievement_quantification": 11.3,
+   "action_verbs": 6.5
+  },
+  "nFound": 15,
+  "nMissing": 10
+ },
+ {
+  "exp": "repeat",
+  "file": "R4_tables.pdf",
+  "role": "SDE-1 Backend Engineer",
+  "run": 1,
+  "score": 62,
+  "breakdown": {
+   "keyword_coverage": 22.8,
+   "section_completeness": 11,
+   "formatting_compliance": 9,
+   "achievement_quantification": 12,
+   "action_verbs": 7
+  },
+  "nFound": 15,
+  "nMissing": 10
+ },
+ {
+  "exp": "repeat",
+  "file": "R4_tables.pdf",
+  "role": "SDE-1 Backend Engineer",
+  "run": 2,
+  "score": 59,
+  "breakdown": {
+   "keyword_coverage": 22.8,
+   "section_completeness": 10,
+   "formatting_compliance": 8,
+   "achievement_quantification": 12,
+   "action_verbs": 6
+  },
+  "nFound": 15,
+  "nMissing": 10
+ },
+ {
+  "exp": "repeat",
+  "file": "R4_tables.pdf",
+  "role": "SDE-1 Backend Engineer",
+  "run": 3,
+  "score": 60,
+  "breakdown": {
+   "keyword_coverage": 23.8,
+   "section_completeness": 11,
+   "formatting_compliance": 7,
+   "achievement_quantification": 12,
+   "action_verbs": 6.5
+  },
+  "nFound": 16,
+  "nMissing": 10
+ },
+ {
+  "exp": "repeat",
+  "file": "R4_tables.pdf",
+  "role": "SDE-1 Backend Engineer",
+  "run": 4,
+  "score": 62,
+  "breakdown": {
+   "keyword_coverage": 22.8,
+   "section_completeness": 12,
+   "formatting_compliance": 8,
+   "achievement_quantification": 12,
+   "action_verbs": 7
+  },
+  "nFound": 12,
+  "nMissing": 9
+ },
+ {
+  "exp": "repeat",
+  "file": "R4_tables.pdf",
+  "role": "SDE-1 Backend Engineer",
+  "run": 5,
+  "score": 61,
+  "breakdown": {
+   "keyword_coverage": 23.8,
+   "section_completeness": 11,
+   "formatting_compliance": 9,
+   "achievement_quantification": 11.3,
+   "action_verbs": 6
+  },
+  "nFound": 15,
+  "nMissing": 10
+ },
+ {
+  "exp": "repeat",
+  "file": "R4_tables.pdf",
+  "role": "SDE-1 Backend Engineer",
+  "run": 6,
+  "score": 62,
+  "breakdown": {
+   "keyword_coverage": 23.8,
+   "section_completeness": 11,
+   "formatting_compliance": 9,
+   "achievement_quantification": 11.3,
+   "action_verbs": 7
+  },
+  "nFound": 15,
+  "nMissing": 10
+ },
+ {
+  "exp": "repeat",
+  "file": "R4_tables.pdf",
+  "role": "SDE-1 Backend Engineer",
+  "run": 7,
+  "score": 71,
+  "breakdown": {
+   "keyword_coverage": 23.8,
+   "section_completeness": 17,
+   "formatting_compliance": 9,
+   "achievement_quantification": 13.2,
+   "action_verbs": 8.2
+  },
+  "nFound": 17,
+  "nMissing": 10
+ },
+ {
+  "exp": "repeat",
+  "file": "R4_tables.pdf",
+  "role": "SDE-1 Backend Engineer",
+  "run": 8,
+  "score": 57,
+  "breakdown": {
+   "keyword_coverage": 22.8,
+   "section_completeness": 11,
+   "formatting_compliance": 7,
+   "achievement_quantification": 10.5,
+   "action_verbs": 5.5
+  },
+  "nFound": 15,
+  "nMissing": 9
+ },
+ {
+  "exp": "repeat",
+  "file": "R4_tables.pdf",
+  "role": "SDE-1 Backend Engineer",
+  "run": 9,
+  "score": 63,
+  "breakdown": {
+   "keyword_coverage": 23.8,
+   "section_completeness": 13,
+   "formatting_compliance": 8,
+   "achievement_quantification": 12.8,
+   "action_verbs": 5.5
+  },
+  "nFound": 15,
+  "nMissing": 9
+ },
+ {
+  "exp": "repeat",
+  "file": "R5_offtarget.pdf",
+  "role": "SDE-1 Backend Engineer",
+  "run": 0,
+  "score": 53,
+  "breakdown": {
+   "keyword_coverage": 1.8,
+   "section_completeness": 12,
+   "formatting_compliance": 19,
+   "achievement_quantification": 13.5,
+   "action_verbs": 7
+  },
+  "nFound": 1,
+  "nMissing": 15
+ },
+ {
+  "exp": "repeat",
+  "file": "R5_offtarget.pdf",
+  "role": "SDE-1 Backend Engineer",
+  "run": 1,
+  "score": 56,
+  "breakdown": {
+   "keyword_coverage": 1.8,
+   "section_completeness": 14,
+   "formatting_compliance": 19,
+   "achievement_quantification": 14.3,
+   "action_verbs": 7
+  },
+  "nFound": 1,
+  "nMissing": 14
+ },
+ {
+  "exp": "repeat",
+  "file": "R5_offtarget.pdf",
+  "role": "SDE-1 Backend Engineer",
+  "run": 2,
+  "score": 51,
+  "breakdown": {
+   "keyword_coverage": 1.8,
+   "section_completeness": 12,
+   "formatting_compliance": 19,
+   "achievement_quantification": 12,
+   "action_verbs": 6
+  },
+  "nFound": 1,
+  "nMissing": 13
+ },
+ {
+  "exp": "repeat",
+  "file": "R5_offtarget.pdf",
+  "role": "SDE-1 Backend Engineer",
+  "run": 3,
+  "score": 54,
+  "breakdown": {
+   "keyword_coverage": 1.8,
+   "section_completeness": 13,
+   "formatting_compliance": 19,
+   "achievement_quantification": 13.5,
+   "action_verbs": 6.5
+  },
+  "nFound": 1,
+  "nMissing": 14
+ },
+ {
+  "exp": "repeat",
+  "file": "R5_offtarget.pdf",
+  "role": "SDE-1 Backend Engineer",
+  "run": 4,
+  "score": 55,
+  "breakdown": {
+   "keyword_coverage": 1.8,
+   "section_completeness": 15,
+   "formatting_compliance": 19,
+   "achievement_quantification": 12.8,
+   "action_verbs": 6.5
+  },
+  "nFound": 1,
+  "nMissing": 14
+ },
+ {
+  "exp": "repeat",
+  "file": "R5_offtarget.pdf",
+  "role": "SDE-1 Backend Engineer",
+  "run": 5,
+  "score": 54,
+  "breakdown": {
+   "keyword_coverage": 1.8,
+   "section_completeness": 14,
+   "formatting_compliance": 19,
+   "achievement_quantification": 12.8,
+   "action_verbs": 6.5
+  },
+  "nFound": 1,
+  "nMissing": 14
+ },
+ {
+  "exp": "repeat",
+  "file": "R5_offtarget.pdf",
+  "role": "SDE-1 Backend Engineer",
+  "run": 6,
+  "score": 52,
+  "breakdown": {
+   "keyword_coverage": 1.8,
+   "section_completeness": 12,
+   "formatting_compliance": 19,
+   "achievement_quantification": 12.8,
+   "action_verbs": 6.5
+  },
+  "nFound": 1,
+  "nMissing": 13
+ },
+ {
+  "exp": "repeat",
+  "file": "R5_offtarget.pdf",
+  "role": "SDE-1 Backend Engineer",
+  "run": 7,
+  "score": 55,
+  "breakdown": {
+   "keyword_coverage": 1.8,
+   "section_completeness": 15,
+   "formatting_compliance": 19,
+   "achievement_quantification": 12.8,
+   "action_verbs": 6.5
+  },
+  "nFound": 1,
+  "nMissing": 12
+ },
+ {
+  "exp": "repeat",
+  "file": "R5_offtarget.pdf",
+  "role": "SDE-1 Backend Engineer",
+  "run": 8,
+  "score": 55,
+  "breakdown": {
+   "keyword_coverage": 1.8,
+   "section_completeness": 15,
+   "formatting_compliance": 19,
+   "achievement_quantification": 13.5,
+   "action_verbs": 6
+  },
+  "nFound": 1,
+  "nMissing": 12
+ },
+ {
+  "exp": "repeat",
+  "file": "R5_offtarget.pdf",
+  "role": "SDE-1 Backend Engineer",
+  "run": 9,
+  "score": 52,
+  "breakdown": {
+   "keyword_coverage": 1.8,
+   "section_completeness": 12,
+   "formatting_compliance": 19,
+   "achievement_quantification": 12.8,
+   "action_verbs": 6
+  },
+  "nFound": 1,
+  "nMissing": 14
+ },
+ {
+  "exp": "paraphrase",
+  "file": "R1_strong.pdf",
+  "role": "Entry-level backend software engineer",
+  "run": 0,
+  "score": 89,
+  "breakdown": {
+   "keyword_coverage": 28.7,
+   "section_completeness": 18.4,
+   "formatting_compliance": 19.6,
+   "achievement_quantification": 14.7,
+   "action_verbs": 7.6
+  }
+ },
+ {
+  "exp": "paraphrase",
+  "file": "R1_strong.pdf",
+  "role": "Entry-level backend software engineer",
+  "run": 1,
+  "score": 92,
+  "breakdown": {
+   "keyword_coverage": 29.8,
+   "section_completeness": 19,
+   "formatting_compliance": 20,
+   "achievement_quantification": 15,
+   "action_verbs": 8.2
+  }
+ },
+ {
+  "exp": "paraphrase",
+  "file": "R1_strong.pdf",
+  "role": "Entry-level backend software engineer",
+  "run": 2,
+  "score": 87,
+  "breakdown": {
+   "keyword_coverage": 28.7,
+   "section_completeness": 17.6,
+   "formatting_compliance": 19.6,
+   "achievement_quantification": 14.3,
+   "action_verbs": 7.2
+  }
+ },
+ {
+  "exp": "paraphrase",
+  "file": "R1_strong.pdf",
+  "role": "Entry-level backend software engineer",
+  "run": 3,
+  "score": 92,
+  "breakdown": {
+   "keyword_coverage": 29.8,
+   "section_completeness": 19,
+   "formatting_compliance": 20,
+   "achievement_quantification": 15,
+   "action_verbs": 8.2
+  }
+ },
+ {
+  "exp": "paraphrase",
+  "file": "R1_strong.pdf",
+  "role": "Entry-level backend software engineer",
+  "run": 4,
+  "score": 92,
+  "breakdown": {
+   "keyword_coverage": 29.8,
+   "section_completeness": 19,
+   "formatting_compliance": 20,
+   "achievement_quantification": 14.3,
+   "action_verbs": 8.5
+  }
+ },
+ {
+  "exp": "paraphrase",
+  "file": "R1_strong.pdf",
+  "role": "Junior Software Development Engineer (backend)",
+  "run": 0,
+  "score": 90,
+  "breakdown": {
+   "keyword_coverage": 29.8,
+   "section_completeness": 18,
+   "formatting_compliance": 19,
+   "achievement_quantification": 14.3,
+   "action_verbs": 8.5
+  }
+ },
+ {
+  "exp": "paraphrase",
+  "file": "R1_strong.pdf",
+  "role": "Junior Software Development Engineer (backend)",
+  "run": 1,
+  "score": 93,
+  "breakdown": {
+   "keyword_coverage": 29.8,
+   "section_completeness": 20,
+   "formatting_compliance": 20,
+   "achievement_quantification": 15,
+   "action_verbs": 8
+  }
+ },
+ {
+  "exp": "paraphrase",
+  "file": "R1_strong.pdf",
+  "role": "Junior Software Development Engineer (backend)",
+  "run": 2,
+  "score": 94,
+  "breakdown": {
+   "keyword_coverage": 29.8,
+   "section_completeness": 20,
+   "formatting_compliance": 20,
+   "achievement_quantification": 15,
+   "action_verbs": 8.8
+  }
+ },
+ {
+  "exp": "paraphrase",
+  "file": "R1_strong.pdf",
+  "role": "Junior Software Development Engineer (backend)",
+  "run": 3,
+  "score": 92,
+  "breakdown": {
+   "keyword_coverage": 28.7,
+   "section_completeness": 20,
+   "formatting_compliance": 20,
+   "achievement_quantification": 14.7,
+   "action_verbs": 8.2
+  }
+ },
+ {
+  "exp": "paraphrase",
+  "file": "R1_strong.pdf",
+  "role": "Junior Software Development Engineer (backend)",
+  "run": 4,
+  "score": 91,
+  "breakdown": {
+   "keyword_coverage": 29.8,
+   "section_completeness": 18,
+   "formatting_compliance": 20,
+   "achievement_quantification": 15,
+   "action_verbs": 8.2
+  }
+ },
+ {
+  "exp": "paraphrase",
+  "file": "R1_strong.pdf",
+  "role": "Backend developer, new graduate",
+  "run": 0,
+  "score": 91,
+  "breakdown": {
+   "keyword_coverage": 29.8,
+   "section_completeness": 18,
+   "formatting_compliance": 20,
+   "achievement_quantification": 14.3,
+   "action_verbs": 8.5
+  }
+ },
+ {
+  "exp": "paraphrase",
+  "file": "R1_strong.pdf",
+  "role": "Backend developer, new graduate",
+  "run": 1,
+  "score": 92,
+  "breakdown": {
+   "keyword_coverage": 29.8,
+   "section_completeness": 20,
+   "formatting_compliance": 20,
+   "achievement_quantification": 14.3,
+   "action_verbs": 8
+  }
+ },
+ {
+  "exp": "paraphrase",
+  "file": "R1_strong.pdf",
+  "role": "Backend developer, new graduate",
+  "run": 2,
+  "score": 91,
+  "breakdown": {
+   "keyword_coverage": 29.8,
+   "section_completeness": 19,
+   "formatting_compliance": 19.6,
+   "achievement_quantification": 14.3,
+   "action_verbs": 8.5
+  }
+ },
+ {
+  "exp": "paraphrase",
+  "file": "R1_strong.pdf",
+  "role": "Backend developer, new graduate",
+  "run": 3,
+  "score": 93,
+  "breakdown": {
+   "keyword_coverage": 29.8,
+   "section_completeness": 20,
+   "formatting_compliance": 20,
+   "achievement_quantification": 14.3,
+   "action_verbs": 8.5
+  }
+ },
+ {
+  "exp": "paraphrase",
+  "file": "R1_strong.pdf",
+  "role": "Backend developer, new graduate",
+  "run": 4,
+  "score": 91,
+  "breakdown": {
+   "keyword_coverage": 28.7,
+   "section_completeness": 20,
+   "formatting_compliance": 20,
+   "achievement_quantification": 15,
+   "action_verbs": 7.5
+  }
+ },
+ {
+  "exp": "paraphrase",
+  "file": "R2_medium.pdf",
+  "role": "Entry-level backend software engineer",
+  "run": 0,
+  "score": 52,
+  "breakdown": {
+   "keyword_coverage": 12.3,
+   "section_completeness": 18,
+   "formatting_compliance": 19,
+   "achievement_quantification": 0,
+   "action_verbs": 3
+  }
+ },
+ {
+  "exp": "paraphrase",
+  "file": "R2_medium.pdf",
+  "role": "Entry-level backend software engineer",
+  "run": 1,
+  "score": 51,
+  "breakdown": {
+   "keyword_coverage": 12.3,
+   "section_completeness": 17,
+   "formatting_compliance": 19,
+   "achievement_quantification": 0,
+   "action_verbs": 3
+  }
+ },
+ {
+  "exp": "paraphrase",
+  "file": "R2_medium.pdf",
+  "role": "Entry-level backend software engineer",
+  "run": 2,
+  "score": 53,
+  "breakdown": {
+   "keyword_coverage": 12.3,
+   "section_completeness": 18,
+   "formatting_compliance": 19,
+   "achievement_quantification": 0,
+   "action_verbs": 4
+  }
+ },
+ {
+  "exp": "paraphrase",
+  "file": "R2_medium.pdf",
+  "role": "Entry-level backend software engineer",
+  "run": 3,
+  "score": 51,
+  "breakdown": {
+   "keyword_coverage": 12.3,
+   "section_completeness": 17,
+   "formatting_compliance": 19,
+   "achievement_quantification": 0,
+   "action_verbs": 3
+  }
+ },
+ {
+  "exp": "paraphrase",
+  "file": "R2_medium.pdf",
+  "role": "Entry-level backend software engineer",
+  "run": 4,
+  "score": 51,
+  "breakdown": {
+   "keyword_coverage": 12.3,
+   "section_completeness": 17,
+   "formatting_compliance": 19,
+   "achievement_quantification": 0,
+   "action_verbs": 3
+  }
+ },
+ {
+  "exp": "paraphrase",
+  "file": "R2_medium.pdf",
+  "role": "Junior Software Development Engineer (backend)",
+  "run": 0,
+  "score": 51,
+  "breakdown": {
+   "keyword_coverage": 12.3,
+   "section_completeness": 17,
+   "formatting_compliance": 19,
+   "achievement_quantification": 0,
+   "action_verbs": 3
+  }
+ },
+ {
+  "exp": "paraphrase",
+  "file": "R2_medium.pdf",
+  "role": "Junior Software Development Engineer (backend)",
+  "run": 1,
+  "score": 51,
+  "breakdown": {
+   "keyword_coverage": 12.3,
+   "section_completeness": 17,
+   "formatting_compliance": 19,
+   "achievement_quantification": 0,
+   "action_verbs": 3
+  }
+ },
+ {
+  "exp": "paraphrase",
+  "file": "R2_medium.pdf",
+  "role": "Junior Software Development Engineer (backend)",
+  "run": 2,
+  "score": 47,
+  "breakdown": {
+   "keyword_coverage": 12.3,
+   "section_completeness": 13,
+   "formatting_compliance": 19,
+   "achievement_quantification": 0,
+   "action_verbs": 3
+  }
+ },
+ {
+  "exp": "paraphrase",
+  "file": "R2_medium.pdf",
+  "role": "Junior Software Development Engineer (backend)",
+  "run": 3,
+  "score": 49,
+  "breakdown": {
+   "keyword_coverage": 12.3,
+   "section_completeness": 15,
+   "formatting_compliance": 19,
+   "achievement_quantification": 0,
+   "action_verbs": 3
+  }
+ },
+ {
+  "exp": "paraphrase",
+  "file": "R2_medium.pdf",
+  "role": "Junior Software Development Engineer (backend)",
+  "run": 4,
+  "score": 52,
+  "breakdown": {
+   "keyword_coverage": 13.3,
+   "section_completeness": 17,
+   "formatting_compliance": 19.6,
+   "achievement_quantification": 0,
+   "action_verbs": 2.5
+  }
+ },
+ {
+  "exp": "paraphrase",
+  "file": "R2_medium.pdf",
+  "role": "Backend developer, new graduate",
+  "run": 0,
+  "score": 51,
+  "breakdown": {
+   "keyword_coverage": 12.3,
+   "section_completeness": 17,
+   "formatting_compliance": 19,
+   "achievement_quantification": 0,
+   "action_verbs": 3
+  }
+ },
+ {
+  "exp": "paraphrase",
+  "file": "R2_medium.pdf",
+  "role": "Backend developer, new graduate",
+  "run": 1,
+  "score": 51,
+  "breakdown": {
+   "keyword_coverage": 12.3,
+   "section_completeness": 17,
+   "formatting_compliance": 19,
+   "achievement_quantification": 0,
+   "action_verbs": 3
+  }
+ },
+ {
+  "exp": "paraphrase",
+  "file": "R2_medium.pdf",
+  "role": "Backend developer, new graduate",
+  "run": 2,
+  "score": 51,
+  "breakdown": {
+   "keyword_coverage": 12.3,
+   "section_completeness": 17,
+   "formatting_compliance": 19,
+   "achievement_quantification": 0,
+   "action_verbs": 3
+  }
+ },
+ {
+  "exp": "paraphrase",
+  "file": "R2_medium.pdf",
+  "role": "Backend developer, new graduate",
+  "run": 3,
+  "score": 54,
+  "breakdown": {
+   "keyword_coverage": 12.3,
+   "section_completeness": 18,
+   "formatting_compliance": 20,
+   "achievement_quantification": 0,
+   "action_verbs": 4
+  }
+ },
+ {
+  "exp": "paraphrase",
+  "file": "R2_medium.pdf",
+  "role": "Backend developer, new graduate",
+  "run": 4,
+  "score": 49,
+  "breakdown": {
+   "keyword_coverage": 8.8,
+   "section_completeness": 18,
+   "formatting_compliance": 19,
+   "achievement_quantification": 0,
+   "action_verbs": 3.5
+  }
+ }
+]

@@ -14,7 +14,7 @@ PrepNinja helps candidates prepare for both non-technical and technical intervie
 
 ### 💻 Technical interview / coding practice
 - Gemini generates topic-specific coding problems (arrays, linked lists, trees, graphs, dynamic programming, etc.).
-- Monaco code editor. Code runs on [Judge0](https://judge0.com) when `JUDGE0_URL` is set, with the public [Piston](https://github.com/engineer-man/piston) API as fallback.
+- Monaco code editor. Code runs on [Judge0](https://judge0.com) when `JUDGE0_URL` is set, with a [Piston](https://github.com/engineer-man/piston) server as fallback (the public Piston API now requires authorisation, so set `JUDGE0_URL` for real use).
 - Each generated problem ships with test cases that are kept only if Gemini's own reference solution passes them in the sandbox.
 - Text-to-speech narration of questions via Murf AI.
 - Same webcam/fullscreen/tab-switch proctoring as the behavioral round.
@@ -35,7 +35,8 @@ PrepNinja helps candidates prepare for both non-technical and technical intervie
 ### 🔬 Research artefacts (`research/`)
 - `benchmark/`: offline comparison of Eq. 1 with PFA, BKT and DKT on ASSISTments 2017 (5-fold, learner-level split).
 - `company_weights/`: script that builds W(t, c) from company-tagged problem lists.
-- `llm_consistency.mjs`: repeats identical resumes through the ATS analyser to measure score variance.
+- `llm/`: reliability checks of the Gemini modules (generated-test validation, ATS score consistency) with raw results.
+- `latency/`: load test of the scoring engine.
 
 ### 🛠️ Admin
 - A basic admin view to list recorded interview attempts and their scores/transcripts.
