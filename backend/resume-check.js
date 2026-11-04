@@ -1,6 +1,7 @@
 import express from 'express';
 import multer from 'multer';
 import { GoogleGenerativeAI } from '@google/generative-ai';
+import { geminiKey, requireKey } from './gemini-key.js';
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
@@ -18,14 +19,6 @@ const upload = multer({
 });
 
 // Initialize Gemini with API key from environment    
-const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
-
-if (!GEMINI_API_KEY) {
-  console.error("ERROR: GEMINI_API_KEY is not set in environment variables!");
-  console.error("Please add GEMINI_API_KEY to your .env file");
-}
-
-const genAI = new GoogleGenerativeAI(GEMINI_API_KEY);
 
 console.log("✓ Gemini initialized with API key from environment");
 
@@ -57,7 +50,7 @@ const ATS_WEIGHTS = {
 const ATS_MODEL = process.env.ATS_MODEL || process.env.GEMINI_MODEL || 'gemini-flash-latest';
 
 // ATS Analysis Endpoint
-router.post('/analyze-resume', upload.single('file'), async (req, res) => {
+router.post('/analyze-resume', requireKey, upload.single('file'), async (req, res) => {
   try {
     if (!req.file) {
       return res.status(400).json({ error: 'No file uploaded' });
@@ -86,7 +79,7 @@ router.post('/analyze-resume', upload.single('file'), async (req, res) => {
     console.log(`File converted to base64: ${fileData.length} characters`);
 
     // Initialize the generative model
-    const model = genAI.getGenerativeModel({ model: ATS_MODEL });
+    const model = new GoogleGenerativeAI(geminiKey()).getGenerativeModel({ model: ATS_MODEL });
 
     // Optional target role and job description make keyword scoring job-specific.
     const targetRole = String(req.body?.targetRole || '').slice(0, 200);

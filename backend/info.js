@@ -3,22 +3,19 @@ import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
 import { pathToFileURL } from "url";
+import { geminiKeyMiddleware, geminiKey, requireKey } from "./gemini-key.js";
 dotenv.config();
 // Node 20+ has a global fetch.
 
 const app = express();
 app.use(cors());
+app.use(geminiKeyMiddleware);
 app.use(express.json({ limit: "1mb" }));
 
 // ---------- CONFIG ----------
-const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
 // Model is configurable because Google retires model versions for new keys.
 const GEMINI_MODEL = process.env.GEMINI_MODEL || "gemini-flash-latest";
 
-if (!GEMINI_API_KEY) {
-  console.error("ERROR: GEMINI_API_KEY not found in environment variables!");
-  console.error("Please add GEMINI_API_KEY to your .env file");
-}
 
 // Use multiple Piston endpoints for fallback
 const PISTON_ENDPOINTS = [
@@ -51,7 +48,7 @@ app.use((req, res, next) => {
  * POST /api/generate
  * Body: { role: string, topics?: string }
  */
-app.post("/api/generate", async (req, res) => {
+app.post("/api/generate", requireKey, async (req, res) => {
   const { role = "software engineer", topics = "data structures" } = req.body || {};
   const topicGuide = TOPIC_GUIDES[topics.toLowerCase()] || 'general relevant data structure and algorithm concepts';
 
@@ -95,7 +92,7 @@ Generate ONLY valid JSON. Do NOT include markdown code blocks or any other text.
   try {
     console.log(`🔍 Generating questions for Topic: ${topics}, Role: ${role}`);
     
-    const url = `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent?key=${GEMINI_API_KEY}`;
+    const url = `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent?key=${geminiKey()}`;
 
     const r = await fetch(url, {
       method: "POST",
@@ -177,7 +174,7 @@ Generate ONLY valid JSON. Do NOT include markdown code blocks or any other text.
  * POST /api/evaluate
  * Body: { question: string, code: string, language: string, topic: string }
  */
-app.post("/api/evaluate", async (req, res) => {
+app.post("/api/evaluate", requireKey, async (req, res) => {
   const { question, code, language, topic } = req.body || {};
 
   if (!question || !code || !language) {
@@ -232,7 +229,7 @@ Generate ONLY valid JSON. Do NOT include markdown code blocks.`;
   try {
     console.log(`🔍 Evaluating code for question in ${language}...`);
     
-    const url = `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent?key=${GEMINI_API_KEY}`;
+    const url = `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent?key=${geminiKey()}`;
 
     const r = await fetch(url, {
       method: "POST",

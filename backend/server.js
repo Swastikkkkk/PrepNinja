@@ -4,6 +4,7 @@
 import resumeCheckRouter from './resume-check.js';
 import engineRouter from './engine/routes.mjs';
 import codingApp from './info.js';
+import { geminiKeyMiddleware, geminiKey, requireKey } from './gemini-key.js';
 import express from 'express';
 import cors from 'cors';
 import multer from 'multer';
@@ -17,6 +18,7 @@ import dotenv from 'dotenv';
 dotenv.config()
 const app = express();
 app.use(cors());
+app.use(geminiKeyMiddleware);
 app.use(express.json({ limit: '20mb' }));
 
 // Add resume check router
@@ -32,7 +34,6 @@ const CLOUDINARY_CLOUD_NAME = process.env.CLOUDINARY_CLOUD_NAME;
 const CLOUDINARY_API_KEY = process.env.CLOUDINARY_API_KEY;
 const CLOUDINARY_API_SECRET = process.env.CLOUDINARY_API_SECRET;
 
-const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
 // Model is configurable because Google retires model versions for new keys.
 const GEMINI_MODEL = process.env.GEMINI_MODEL || "gemini-flash-latest";
 const DEEPGRAM_API_KEY = process.env.DEEPGRAM_API_KEY;
@@ -93,8 +94,8 @@ async function saveAttemptMetadata(meta) {
 // Gemini helper (REST generateContent)
 // ----------------------------
 async function callGemini(promptText, model = GEMINI_MODEL) {
-  if (!GEMINI_API_KEY) {
-    throw new Error("GEMINI_API_KEY not set in server.js");
+  if (!geminiKey()) {
+    throw new Error("NEED_KEY");
   }
 
   const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`;
@@ -106,7 +107,7 @@ async function callGemini(promptText, model = GEMINI_MODEL) {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
-      "x-goog-api-key": GEMINI_API_KEY,
+      "x-goog-api-key": geminiKey(),
     },
     body: JSON.stringify(payload),
   });
@@ -123,7 +124,7 @@ async function callGemini(promptText, model = GEMINI_MODEL) {
 // ----------------------------
 // Generate questions using Gemini
 // ----------------------------
-app.post("/api/generate-questions", async (req, res) => {
+app.post("/api/generate-questions", requireKey, async (req, res) => {
   try {
     const { rolePrompt, company = "", interviewType = "behavioural", count = 2 } = req.body || {};
     if (!rolePrompt || typeof rolePrompt !== "string") {
@@ -133,7 +134,7 @@ app.post("/api/generate-questions", async (req, res) => {
     const type = ["behavioural", "hr", "case"].includes(String(interviewType).toLowerCase()) ? String(interviewType).toLowerCase() : "behavioural";
     const org = String(company).slice(0, 80);
 
-    if (GEMINI_API_KEY) {
+    if (geminiKey()) {
       // Persona conditioning: a consistent interviewer identity tied to the target company.
       const prompt = `
 You are a senior interviewer${org ? ` at ${org}` : ""} running a ${type} interview for this role: "${rolePrompt}".
@@ -171,7 +172,7 @@ Requirements:
 // ----------------------------
 // Upload endpoint (Cloudinary)
 // ----------------------------
-app.post("/api/upload-answer", upload.single("file"), async (req, res) => {
+app.post("/api/upload-answer", requireKey, upload.single("file"), async (req, res) => {
   try {
     const file = req.file;
     const { sessionId, questionId, userId, questionText } = req.body || {};
@@ -325,11 +326,11 @@ async function transcribe({ fileUrl, buffer, mimetype }) {
       } catch (e) { console.warn("Deepgram bytes failed:", e.message); }
     }
   }
-  if (buffer && GEMINI_API_KEY && buffer.length < 19 * 1024 * 1024) {
+  if (buffer && geminiKey() && buffer.length < 19 * 1024 * 1024) {
     try {
       const r = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent`, {
         method: "POST",
-        headers: { "Content-Type": "application/json", "x-goog-api-key": GEMINI_API_KEY },
+        headers: { "Content-Type": "application/json", "x-goog-api-key": geminiKey() },
         body: JSON.stringify({
           contents: [{ parts: [
             { inline_data: { mime_type: (mimetype || "video/webm").split(";")[0], data: buffer.toString("base64") } },
@@ -507,7 +508,7 @@ ${transcript || "(empty - no audio detected)"}
 
     // Step 3: Get AI scoring
     let scoring = null;
-    if (GEMINI_API_KEY) {
+    if (geminiKey()) {
       try {
         const geminiResponse = await callGemini(scoringPrompt);
         console.log("Gemini raw response:", geminiResponse?.substring(0, 200));
