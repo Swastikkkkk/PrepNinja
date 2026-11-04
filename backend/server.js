@@ -3,10 +3,11 @@
 
 import resumeCheckRouter from './resume-check.js';
 import engineRouter from './engine/routes.mjs';
+import codingApp from './info.js';
 import express from 'express';
 import cors from 'cors';
 import multer from 'multer';
-import bodyParser from 'body-parser';
+
 import { nanoid } from 'nanoid';
 import cloudinary from 'cloudinary';
 import fs from 'fs-extra';
@@ -16,7 +17,7 @@ import dotenv from 'dotenv';
 dotenv.config()
 const app = express();
 app.use(cors());
-app.use(bodyParser.json({ limit: '20mb' }));
+app.use(express.json({ limit: '20mb' }));
 
 // Add resume check router
 app.use('/api', resumeCheckRouter);
@@ -37,6 +38,8 @@ const GEMINI_MODEL = process.env.GEMINI_MODEL || "gemini-flash-latest";
 const DEEPGRAM_API_KEY = process.env.DEEPGRAM_API_KEY;
 
 const PORT = process.env.PORT || 8080;
+const MURF_API_KEY = process.env.MURF_API_KEY;
+const HAS_CLOUDINARY = Boolean(CLOUDINARY_CLOUD_NAME && CLOUDINARY_API_KEY && CLOUDINARY_API_SECRET);
 const ATTEMPTS_FILE = path.join(process.cwd(), "attempts.json");
 const EVENTS_FILE = path.join(process.cwd(), "events.json");
 
@@ -198,7 +201,11 @@ app.post("/api/upload-answer", upload.single("file"), async (req, res) => {
         cldStream.end(file.buffer);
       });
 
-    const result = await uploadStream();
+    // Cloudinary keeps the video if configured; otherwise we only keep the transcript and scores.
+    let result = {};
+    if (HAS_CLOUDINARY) {
+      try { result = await uploadStream(); } catch (e) { console.warn("Cloudinary upload failed:", e.message); }
+    }
 
     const meta = {
       attemptId,
@@ -219,8 +226,9 @@ app.post("/api/upload-answer", upload.single("file"), async (req, res) => {
 
     await saveAttemptMetadata(meta);
 
-    // async process (fire and forget)
-    processAttemptFile(meta).catch(e => console.error("processAttemptFile failed:", e));
+    // async process (fire and forget); the buffer lets us transcribe without Cloudinary
+    processAttemptFile({ ...meta, buffer: file.buffer, mimetype: file.mimetype || "video/webm" })
+      .catch(e => console.error("processAttemptFile failed:", e));
 
     return res.json({ ok: true, meta: { attemptId: meta.attemptId, uploadedAt: meta.uploadedAt } });
   } catch (err) {
@@ -293,6 +301,51 @@ async function transcribeWithDeepgram(fileUrl) {
     console.warn("Deepgram request failed:", e);
     return "";
   }
+}
+
+// Deepgram (by URL or raw bytes) when DEEPGRAM_API_KEY is set, otherwise Gemini audio understanding.
+async function transcribe({ fileUrl, buffer, mimetype }) {
+  if (DEEPGRAM_API_KEY) {
+    if (fileUrl) {
+      const t = await transcribeWithDeepgram(fileUrl);
+      if (t) return t;
+    }
+    if (buffer) {
+      try {
+        const r = await fetch("https://api.deepgram.com/v1/listen?punctuate=true&language=en-US&smart_format=true", {
+          method: "POST",
+          headers: { Authorization: `Token ${DEEPGRAM_API_KEY}`, "Content-Type": mimetype || "video/webm" },
+          body: buffer,
+        });
+        if (r.ok) {
+          const j = await r.json();
+          const t = j?.results?.channels?.[0]?.alternatives?.[0]?.transcript;
+          if (t) return t;
+        }
+      } catch (e) { console.warn("Deepgram bytes failed:", e.message); }
+    }
+  }
+  if (buffer && GEMINI_API_KEY && buffer.length < 19 * 1024 * 1024) {
+    try {
+      const r = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "x-goog-api-key": GEMINI_API_KEY },
+        body: JSON.stringify({
+          contents: [{ parts: [
+            { inline_data: { mime_type: (mimetype || "video/webm").split(";")[0], data: buffer.toString("base64") } },
+            { text: "Transcribe exactly what the speaker says, word for word, including filler words like um and uh. Return only the transcript text. If nobody speaks, return an empty string." },
+          ] }],
+          generationConfig: { temperature: 0 },
+        }),
+      });
+      if (r.ok) {
+        const j = await r.json();
+        return (j?.candidates?.[0]?.content?.parts?.[0]?.text || "").trim();
+      }
+      console.warn("Gemini transcription failed:", r.status, (await r.text()).slice(0, 200));
+    } catch (e) { console.warn("Gemini transcription error:", e.message); }
+  }
+  return "";
 }
 
 // ----------------------------
@@ -403,12 +456,14 @@ async function processAttemptFile(meta) {
   try {
     console.log("processAttemptFile start for", meta.attemptId);
     const fileUrl = meta.cloudinaryUrl;
+    const { buffer, mimetype } = meta;
+    delete meta.buffer; delete meta.mimetype;
     const questionText = meta.questionText || `Question ID: ${meta.questionId}`;
 
     // Step 1: Transcribe audio
     let transcript = "";
     try {
-      transcript = await transcribeWithDeepgram(fileUrl);
+      transcript = await transcribe({ fileUrl, buffer, mimetype });
       console.log("Deepgram transcript:", transcript ? `${transcript.length} chars` : "empty");
     } catch (e) {
       console.warn("Transcription failed:", e.message);
@@ -517,6 +572,32 @@ ${transcript || "(empty - no audio detected)"}
 // ----------------------------
 // Start server
 // ----------------------------
+// ----------------------------
+// TTS: Murf on the server so the key never ships to the browser.
+// The frontend falls back to the browser voice on any error.
+// ----------------------------
+app.post("/api/tts", async (req, res) => {
+  const text = String(req.body?.text || "").slice(0, 2500);
+  if (!MURF_API_KEY || !text) return res.status(503).json({ error: "tts unavailable" });
+  try {
+    const r = await fetch("https://api.murf.ai/v1/speech/generate", {
+      method: "POST",
+      headers: { "Content-Type": "application/json", "api-key": MURF_API_KEY },
+      body: JSON.stringify({ text, voiceId: "en-US-natalie", format: "MP3" }),
+    });
+    if (!r.ok) return res.status(503).json({ error: `murf ${r.status}` });
+    const j = await r.json();
+    return j.audioFile ? res.json({ audioFile: j.audioFile }) : res.status(503).json({ error: "no audio" });
+  } catch (e) {
+    return res.status(503).json({ error: "tts failed" });
+  }
+});
+
+app.get("/", (_req, res) => res.json({ ok: true, service: "prepninja-api" }));
+
+// Coding round routes (/api/generate, /api/evaluate, /api/compile, /api/health)
+app.use(codingApp);
+
 app.listen(PORT, () => {
   console.log(`Interview server listening on port ${PORT}`);
   console.log(`Node version: ${process.version}`);

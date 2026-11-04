@@ -1,3 +1,4 @@
+import { API_BASE } from "./lib/config";
 import { useState, useRef } from "react";
 import { Button } from "./components/ui/button";
 import { motion } from "framer-motion";
@@ -94,7 +95,6 @@ export default function ATSChecker() {
 
 
       // Update this URL based on your backend setup
-      const API_BASE = "http://localhost:8080";
       const response = await fetch(`${API_BASE}/api/analyze-resume`, {
         method: 'POST',
         body: formData,

@@ -1,10 +1,11 @@
+import { API_BASE } from "./lib/config";
 import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Play, Camera, StopCircle, Loader2, CheckCircle, AlertTriangle } from "lucide-react";
 
 type GeneratedQuestion = { id: string; text: string };
 
-export default function InterviewFlow({ apiBase = "http://localhost:8080" }: { apiBase?: string }) {
+export default function InterviewFlow({ apiBase = API_BASE }: { apiBase?: string }) {
   const navigate = useNavigate();
   const PREP_TIME = 5;
   const REC_TIME = 10;

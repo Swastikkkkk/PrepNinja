@@ -1,5 +1,6 @@
 // Client for the Skill Scoring Engine (backend/engine, mounted at /api/engine on the interview API).
-export const ENGINE_URL = import.meta.env.VITE_ENGINE_URL || "http://localhost:8080";
+import { API_BASE } from "./config";
+export const ENGINE_URL = API_BASE;
 
 export function userId(): string {
   const k = "prepninja.uid";

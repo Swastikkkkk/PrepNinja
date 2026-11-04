@@ -1,11 +1,10 @@
 // info.js — Gemini + Compile proxy with Topic-Specific Generation + Code Evaluation
-// Run: npm install express cors node-fetch@2
-
-const express = require("express");
-const fetchModule = require("node-fetch");
-const fetch = fetchModule.default || fetchModule;
-const cors = require("cors");
-require("dotenv").config();
+import express from "express";
+import cors from "cors";
+import dotenv from "dotenv";
+import { pathToFileURL } from "url";
+dotenv.config();
+// Node 20+ has a global fetch.
 
 const app = express();
 app.use(cors());
@@ -287,7 +286,8 @@ Generate ONLY valid JSON. Do NOT include markdown code blocks.`;
 // ---------- Judge0 (preferred when JUDGE0_URL is set) ----------
 // Self-hosted Judge0 CE: JUDGE0_URL=http://localhost:2358
 // RapidAPI:             JUDGE0_URL=https://judge0-ce.p.rapidapi.com  JUDGE0_KEY=<key>
-const JUDGE0_URL = process.env.JUDGE0_URL;
+// Free public Judge0 CE by default; set JUDGE0_URL/JUDGE0_KEY for RapidAPI or self-hosted.
+const JUDGE0_URL = process.env.JUDGE0_URL || "https://ce.judge0.com";
 const JUDGE0_KEY = process.env.JUDGE0_KEY;
 const JUDGE0_LANG = { python: 71, java: 62, cpp: 54, "c++": 54, javascript: 63, c: 50 };
 
@@ -442,12 +442,10 @@ app.use((err, req, res, next) => {
   });
 });
 
-const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => {
-  console.log(`\n✅ Interview Proctoring Server running on port ${PORT}`);
-  console.log(`   🔗 API Base: http://localhost:${PORT}`);
-  console.log(`   📝 Generate Questions: POST /api/generate`);
-  console.log(`   ⚙️  Compile Code: POST /api/compile`);
-  console.log(`   🎯 Evaluate Code: POST /api/evaluate`);
-  console.log(`   🏥 Health Check: GET /api/health\n`);
-});
+export default app;
+
+// Run standalone with `node info.js`; when imported, server.js mounts it.
+if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
+  const PORT = process.env.PORT || 5000;
+  app.listen(PORT, () => console.log(`Coding server on port ${PORT}`));
+}

@@ -1,3 +1,4 @@
+import { API_BASE } from "./lib/config";
 import React, { useEffect, useRef, useState, useCallback } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import Editor from "@monaco-editor/react";
@@ -17,8 +18,8 @@ type TestCase = { input: string; expectedOutput: string; description: string };
 type TestResult = { passed: boolean; input: string; expected: string; actual: string; description: string };
 type QuestionAttempt = { questionId: string; questionText: string; passed: boolean; testsPassed: number; testsTotal: number; code: string };
 
-const MURF_API_KEY = import.meta.env.VITE_MURF_API_KEY || "";
-const BACKEND_URL = "http://localhost:5000";
+const MURF_API_KEY = "server";
+const BACKEND_URL = API_BASE;
 
 if (!MURF_API_KEY) {
   console.warn("VITE_MURF_API_KEY not found in environment variables. Text-to-speech features will not work.");
@@ -319,10 +320,10 @@ export default function Interview() {
     if (ttsDelayTimer.current) clearTimeout(ttsDelayTimer.current);
     ttsDelayTimer.current = setTimeout(async () => {
       try {
-        const resp = await fetch('https://api.murf.ai/v1/speech/generate', {
+        const resp = await fetch(`${API_BASE}/api/tts`, {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json', 'Accept': 'application/json', 'api-key': MURF_API_KEY },
-          body: JSON.stringify({ text, voiceId: "en-US-natalie", multiNativeLocale: "en-IN" })
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ text })
         });
         if (!resp.ok) throw new Error(`Murf API error ${resp.status}`);
         const data = await resp.json();

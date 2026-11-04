@@ -1,5 +1,6 @@
 "use client"
 
+import { API_BASE } from "./lib/config";
 import { useEffect, useState, useRef } from "react"
 import { useNavigate, useLocation } from "react-router-dom"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
@@ -47,7 +48,7 @@ type Attempt = {
 
 
 export default function InterviewSetup({
-  apiBase = "http://localhost:8080",
+  apiBase = API_BASE,
   adminToken = "",
 }: {
   apiBase?: string

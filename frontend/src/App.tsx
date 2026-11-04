@@ -1,3 +1,4 @@
+import { API_BASE } from "./lib/config";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import InterviewFlow from "./InterviewFlow";
 import InterviewSetup from "./InterviewSetup";
@@ -9,7 +10,6 @@ import Dashboard from "./Dashboard";
 
 
 export default function App() {
-  const API_BASE = "http://localhost:8080";
   const ADMIN_TOKEN = ""; // Leave empty or add your backend admin token
 
 
