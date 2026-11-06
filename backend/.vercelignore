@@ -1,0 +1,8 @@
+node_modules
+uploads
+.env
+*.json.bak
+attempts.json
+events.json
+engine-data.json
+Dockerfile
