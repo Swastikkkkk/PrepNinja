@@ -92,7 +92,7 @@ Generate ONLY valid JSON. Do NOT include markdown code blocks or any other text.
     
     let responseText = "";
     try {
-      responseText = await chat(prompt, { temperature: 1.0, maxTokens: 8192 });
+      responseText = await chat(prompt, { temperature: 1.0, maxTokens: 8192, model: process.env.NVIDIA_FAST_MODEL || "nvidia/nemotron-3.5-super-vl-120b-a12b" });
     } catch (e) {
       console.error("❌ Nemotron API error:", e.message);
       return res.status(e.status || 502).json({ error: "Nemotron API request failed", details: e.message });
@@ -122,24 +122,25 @@ Generate ONLY valid JSON. Do NOT include markdown code blocks or any other text.
 
     // Safeguard: keep only test cases that the model's own reference solution passes
     // in the sandbox, so generated problems cannot ship with wrong expected outputs.
-    const checked = [];
-    for (const q of parsed.questions) {
+    // Run every reference check in parallel so the route fits serverless time limits.
+    const checked = await Promise.all(parsed.questions.map(async (q) => {
       const tests = Array.isArray(q.tests) ? q.tests.slice(0, 8) : [];
-      const valid = [];
-      if (q.reference) {
-        for (const t of tests) {
-          try {
-            const out = await execute("python", q.reference, String(t.stdin ?? ""));
-            if (sameOutput(out.stdout, String(t.expected ?? ""))) valid.push({ stdin: String(t.stdin ?? ""), expected: String(t.expected ?? "").trim() });
-          } catch (e) { console.warn("reference run failed:", e.message); }
-        }
-      }
-      checked.push({
+      const results = q.reference ? await Promise.all(tests.map(async (t) => {
+        try {
+          const out = await Promise.race([
+            execute("python", q.reference, String(t.stdin ?? "")),
+            new Promise((_, rej) => setTimeout(() => rej(new Error("timeout")), 15000)),
+          ]);
+          return sameOutput(out.stdout, String(t.expected ?? "")) ? { stdin: String(t.stdin ?? ""), expected: String(t.expected ?? "").trim() } : null;
+        } catch (e) { console.warn("reference run failed:", e.message); return null; }
+      })) : [];
+      const valid = results.filter(Boolean);
+      return {
         id: q.id, text: q.text,
         difficulty: ["easy", "medium", "hard"].includes(q.difficulty) ? q.difficulty : "medium",
         tests: valid, testsGenerated: tests.length, validated: valid.length >= 2,
-      });
-    }
+      };
+    }));
     console.log(`✅ Generated ${checked.length} questions for ${topics}; validated tests: ${checked.map((q) => `${q.tests.length}/${q.testsGenerated}`).join(", ")}`);
     return res.json({ questions: checked });
 
