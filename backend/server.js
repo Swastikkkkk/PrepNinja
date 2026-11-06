@@ -4,7 +4,8 @@
 import resumeCheckRouter from './resume-check.js';
 import engineRouter from './engine/routes.mjs';
 import codingApp from './info.js';
-import { llmKeyMiddleware, llmKey, requireKey, chat } from './llm.js';
+import { llmKeyMiddleware, llmKey, requireKey, chat, transcribeWav } from './llm.js';
+import { upsertRow, getRow, listRows } from './db.js';
 import express from 'express';
 import cors from 'cors';
 import multer from 'multer';
@@ -42,8 +43,6 @@ const DEEPGRAM_API_KEY = process.env.DEEPGRAM_API_KEY;
 const PORT = process.env.PORT || 8080;
 const MURF_API_KEY = process.env.MURF_API_KEY;
 const HAS_CLOUDINARY = Boolean(CLOUDINARY_CLOUD_NAME && CLOUDINARY_API_KEY && CLOUDINARY_API_SECRET);
-const ATTEMPTS_FILE = path.join(process.cwd(), "attempts.json");
-const EVENTS_FILE = path.join(process.cwd(), "events.json");
 
 // ----------------------------
 // Cloudinary config
@@ -63,33 +62,15 @@ const upload = multer({
 });
 
 // ----------------------------
-// local JSON helpers
+// storage helpers (Supabase or local JSON, see db.js)
 // ----------------------------
-async function readJSON(filePath) {
-  try {
-    const exists = await fs.pathExists(filePath);
-    if (!exists) return [];
-    const txt = await fs.readFile(filePath, "utf8");
-    return JSON.parse(txt || "[]");
-  } catch (e) {
-    console.warn("readJSON error for", filePath, e);
-    return [];
-  }
-}
-
-async function writeJSON(filePath, arr) {
-  try {
-    await fs.writeFile(filePath, JSON.stringify(arr, null, 2));
-  } catch (e) {
-    console.warn("writeJSON error for", filePath, e);
-  }
-}
-
 async function saveAttemptMetadata(meta) {
-  const arr = await readJSON(ATTEMPTS_FILE);
-  arr.push(meta);
-  await writeJSON(ATTEMPTS_FILE, arr);
+  await upsertRow("attempts", meta.attemptId, meta);
 }
+
+// Keep the function alive for background work on Vercel; locally just run it.
+let waitUntil = (p) => p;
+try { ({ waitUntil } = await import("@vercel/functions")); } catch { /* not on Vercel */ }
 
 // ----------------------------
 // LLM helper (NVIDIA Nemotron)
@@ -150,7 +131,7 @@ Requirements:
 app.post("/api/upload-answer", requireKey, upload.single("file"), async (req, res) => {
   try {
     const file = req.file;
-    const { sessionId, questionId, userId, questionText } = req.body || {};
+    const { sessionId, questionId, userId, questionText, transcript: clientTranscript } = req.body || {};
 
     if (!file) return res.status(400).send("file is required (multipart 'file')");
     if (!sessionId) return res.status(400).send("sessionId required");
@@ -202,10 +183,14 @@ app.post("/api/upload-answer", requireKey, upload.single("file"), async (req, re
 
     await saveAttemptMetadata(meta);
 
-    // async process (fire and forget); the buffer lets us transcribe without Cloudinary
-    processAttemptFile({ ...meta, buffer: file.buffer, mimetype: file.mimetype || "video/webm" })
-      .catch(e => console.error("processAttemptFile failed:", e));
+    const job = processAttemptFile({ ...meta, buffer: file.buffer, mimetype: file.mimetype || "video/webm", clientTranscript: String(clientTranscript || "").slice(0, 8000) });
 
+    // Serverless instances don't share disk, so on Vercel score inline and return the result.
+    if (process.env.VERCEL || req.query.sync) {
+      const out = await job;
+      return res.json({ ok: true, meta: { attemptId: meta.attemptId, uploadedAt: meta.uploadedAt }, attempt: out.attempt || null });
+    }
+    waitUntil(job.catch(e => console.error("processAttemptFile failed:", e)));
     return res.json({ ok: true, meta: { attemptId: meta.attemptId, uploadedAt: meta.uploadedAt } });
   } catch (err) {
     console.error("upload-answer error:", err);
@@ -220,9 +205,7 @@ app.post("/api/flag-suspicious", async (req, res) => {
   try {
     const { sessionId, userId, reason } = req.body || {};
     const event = { id: `evt-${nanoid(6)}`, sessionId, userId, reason: reason || "unknown", at: new Date().toISOString() };
-    const arr = await readJSON(EVENTS_FILE);
-    arr.push(event);
-    await writeJSON(EVENTS_FILE, arr);
+    await upsertRow("events", event.id, event);
     return res.json({ ok: true, event });
   } catch (err) {
     console.error("flag-suspicious error:", err);
@@ -235,13 +218,19 @@ app.post("/api/flag-suspicious", async (req, res) => {
 // ----------------------------
 app.get("/api/admin/attempts", async (req, res) => {
   try {
-    const arr = await readJSON(ATTEMPTS_FILE);
+    const arr = await listRows("attempts");
     arr.sort((a, b) => (b.uploadedAt || "").localeCompare(a.uploadedAt || ""));
     return res.json({ attempts: arr });
   } catch (err) {
     console.error("admin attempts error", err);
     res.status(500).json({ error: "failed to read attempts" });
   }
+});
+
+app.get("/api/attempts/:id", async (req, res) => {
+  const a = await getRow("attempts", req.params.id);
+  if (!a) return res.status(404).json({ error: "not found" });
+  res.json({ attempt: a });
 });
 
 // ----------------------------
@@ -300,6 +289,13 @@ async function transcribe({ fileUrl, buffer, mimetype }) {
         }
       } catch (e) { console.warn("Deepgram bytes failed:", e.message); }
     }
+  }
+  // NVIDIA Nemotron omni handles WAV audio (the browser converts recordings to 16 kHz WAV).
+  if (buffer && llmKey() && /wav/i.test(mimetype || "")) {
+    try {
+      const t = await transcribeWav(buffer);
+      if (t) return t;
+    } catch (e) { console.warn("Nemotron transcription error:", e.message); }
   }
   if (buffer && GEMINI_API_KEY && buffer.length < 19 * 1024 * 1024) {
     try {
@@ -432,15 +428,16 @@ async function processAttemptFile(meta) {
   try {
     console.log("processAttemptFile start for", meta.attemptId);
     const fileUrl = meta.cloudinaryUrl;
-    const { buffer, mimetype } = meta;
-    delete meta.buffer; delete meta.mimetype;
+    const { buffer, mimetype, clientTranscript } = meta;
+    delete meta.buffer; delete meta.mimetype; delete meta.clientTranscript;
     const questionText = meta.questionText || `Question ID: ${meta.questionId}`;
 
     // Step 1: Transcribe audio
     let transcript = "";
     try {
       transcript = await transcribe({ fileUrl, buffer, mimetype });
-      console.log("Deepgram transcript:", transcript ? `${transcript.length} chars` : "empty");
+      if (!transcript && clientTranscript) transcript = clientTranscript;
+      console.log("Transcript:", transcript ? `${transcript.length} chars` : "empty");
     } catch (e) {
       console.warn("Transcription failed:", e.message);
       transcript = "";
@@ -513,8 +510,6 @@ ${transcript || "(empty - no audio detected)"}
     console.log("Final scoring:", scoring);
 
     // Step 6: Save results
-    const arr = await readJSON(ATTEMPTS_FILE);
-    const idx = arr.findIndex(a => a.attemptId === meta.attemptId);
     const now = new Date().toISOString();
 
     const update = {
@@ -524,13 +519,7 @@ ${transcript || "(empty - no audio detected)"}
       scoring
     };
 
-    if (idx >= 0) {
-      arr[idx] = { ...arr[idx], ...update };
-    } else {
-      arr.push({ ...meta, ...update });
-    }
-
-    await writeJSON(ATTEMPTS_FILE, arr);
+    const attempt = await upsertRow("attempts", meta.attemptId, { ...meta, ...update });
 
     console.log(
       `✓ Processing complete for ${meta.attemptId}`,
@@ -538,7 +527,7 @@ ${transcript || "(empty - no audio detected)"}
       `| Scores: F:${scoring.fluency} C:${scoring.correctness} G:${scoring.grammar} S:${scoring.stammering} Co:${scoring.content}`
     );
 
-    return { success: true, scoring };
+    return { success: true, scoring, attempt };
   } catch (err) {
     console.error("processAttemptFile error:", err);
     return { success: false, error: err.message };
@@ -574,7 +563,9 @@ app.get("/", (_req, res) => res.json({ ok: true, service: "prepninja-api" }));
 // Coding round routes (/api/generate, /api/evaluate, /api/compile, /api/health)
 app.use(codingApp);
 
-app.listen(PORT, () => {
+export default app;
+
+if (!process.env.VERCEL) app.listen(PORT, () => {
   console.log(`Interview server listening on port ${PORT}`);
   console.log(`Node version: ${process.version}`);
   console.log(`Cloudinary uploads: interview_attempts/<sessionId>`);

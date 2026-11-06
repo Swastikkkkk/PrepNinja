@@ -1,6 +1,7 @@
 "use client"
 
 import { API_BASE } from "./lib/config";
+import { getLocalAttempts } from "@/lib/audio"
 import { useEffect, useState, useRef } from "react"
 import { useNavigate, useLocation } from "react-router-dom"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
@@ -77,7 +78,11 @@ export default function InterviewSetup({
         throw new Error(txt || `HTTP ${res.status}`)
       }
       const data = await res.json()
-      const arr: Attempt[] = (data.attempts || []).map((a: any) => ({
+      const server = data.attempts || []
+      const ids = new Set(server.map((a: any) => a.attemptId))
+      const merged = [...server, ...getLocalAttempts().filter((a: any) => !ids.has(a.attemptId))]
+        .sort((a: any, b: any) => (b.uploadedAt || "").localeCompare(a.uploadedAt || ""))
+      const arr: Attempt[] = merged.map((a: any) => ({
         attemptId: a.attemptId,
         sessionId: a.sessionId,
         questionId: a.questionId,

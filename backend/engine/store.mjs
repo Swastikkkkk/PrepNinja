@@ -1,21 +1,21 @@
 // Persistence for profiles and attempts.
 // Uses Cloud Firestore when FIREBASE_SERVICE_ACCOUNT (JSON string or file path) is set,
-// otherwise a local JSON file (engine-data.json) for development.
+// otherwise db.js rows (Supabase or local JSON).
 import fs from "fs-extra";
-import path from "path";
+import { getRow, upsertRow, deleteRow } from "../db.js";
 
-const LOCAL_FILE = path.join(process.cwd(), "engine-data.json");
 
 class LocalStore {
-  constructor() {
-    this.data = fs.existsSync(LOCAL_FILE) ? fs.readJsonSync(LOCAL_FILE) : { profiles: {}, attempts: {} };
+  // Rows in db.js (Supabase when configured, otherwise JSON files).
+  async getProfile(uid) { return (await getRow("engine", `profile:${uid}`)) || null; }
+  async setProfile(uid, p) { await upsertRow("engine", `profile:${uid}`, p); return p; }
+  async addAttempt(uid, a) {
+    const cur = (await getRow("engine", `attempts:${uid}`))?.list || [];
+    await upsertRow("engine", `attempts:${uid}`, { list: [...cur, a] });
+    return a;
   }
-  async #save() { await fs.writeJson(LOCAL_FILE, this.data, { spaces: 1 }); }
-  async getProfile(uid) { return this.data.profiles[uid] || null; }
-  async setProfile(uid, p) { this.data.profiles[uid] = p; await this.#save(); return p; }
-  async addAttempt(uid, a) { (this.data.attempts[uid] ||= []).push(a); await this.#save(); return a; }
-  async getAttempts(uid) { return this.data.attempts[uid] || []; }
-  async deleteUser(uid) { delete this.data.profiles[uid]; delete this.data.attempts[uid]; await this.#save(); }
+  async getAttempts(uid) { return (await getRow("engine", `attempts:${uid}`))?.list || []; }
+  async deleteUser(uid) { await deleteRow("engine", `profile:${uid}`); await deleteRow("engine", `attempts:${uid}`); }
 }
 
 class FirestoreStore {

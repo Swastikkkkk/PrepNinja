@@ -1,4 +1,5 @@
 import { API_BASE } from "./lib/config";
+import { startAudioRecorder, toWav16k, startSpeechCapture, saveLocalAttempt } from "@/lib/audio";
 import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Play, Camera, StopCircle, Loader2, CheckCircle, AlertTriangle } from "lucide-react";
@@ -183,6 +184,8 @@ export default function InterviewFlow({ apiBase = API_BASE }: { apiBase?: string
   }, [phase, prepSeconds]);
 
   const recTimerRef = useRef<NodeJS.Timeout | null>(null);
+  const stopAudioRef = useRef<null | (() => Promise<Blob>)>(null);
+  const stopSpeechRef = useRef<null | (() => string)>(null);
 
   const startRecordingForCurrentQuestion = () => {
     const stream = streamRef.current;
@@ -211,7 +214,10 @@ export default function InterviewFlow({ apiBase = API_BASE }: { apiBase?: string
         }
 
         const blob = new Blob(chunksRef.current, { type: chunksRef.current.length ? chunksRef.current[0].type : "video/webm" });
-        await uploadAndFinalize(blob, questions![currentQIndex].id, questions![currentQIndex].text);
+        const spoken = stopSpeechRef.current?.() || "";
+        const audio = stopAudioRef.current ? await stopAudioRef.current() : null;
+        const wav = audio && audio.size ? await toWav16k(audio) : null;
+        await uploadAndFinalize(wav || blob, questions![currentQIndex].id, questions![currentQIndex].text, spoken);
         if (currentQIndex === 0) {
           setCurrentQIndex(1);
           setPrepSeconds(PREP_TIME);
@@ -228,6 +234,8 @@ export default function InterviewFlow({ apiBase = API_BASE }: { apiBase?: string
       };
 
       mr.start();
+      try { stopAudioRef.current = startAudioRecorder(stream); } catch { stopAudioRef.current = null; }
+      stopSpeechRef.current = startSpeechCapture();
       setRecSeconds(REC_TIME);
       setPhase("recording");
 
@@ -267,7 +275,7 @@ export default function InterviewFlow({ apiBase = API_BASE }: { apiBase?: string
     }
   };
 
-  const uploadAndFinalize = async (file: Blob, questionId: string, questionText: string) => {
+  const uploadAndFinalize = async (file: Blob, questionId: string, questionText: string, spoken = "") => {
     setUploading(true);
     try {
       const form = new FormData();
@@ -275,13 +283,16 @@ export default function InterviewFlow({ apiBase = API_BASE }: { apiBase?: string
       form.append("questionId", questionId);
       form.append("userId", userId);
       form.append("questionText", questionText);
-      form.append("file", file, `${userId}_${questionId}_${Date.now()}.webm`);
+      form.append("transcript", spoken);
+      form.append("file", file, `${userId}_${questionId}_${Date.now()}.${file.type.includes("wav") ? "wav" : "webm"}`);
 
       const res = await fetch(`${apiBase}/api/upload-answer`, { method: "POST", body: form });
       if (!res.ok) {
         const text = await res.text();
         throw new Error(text || "upload failed");
       }
+      const data = await res.json().catch(() => null);
+      if (data?.attempt) saveLocalAttempt(data.attempt);
     } catch (err: any) {
       console.error(err);
       alert("Upload failed: " + (err?.message || err));

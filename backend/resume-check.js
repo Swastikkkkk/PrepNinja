@@ -4,6 +4,7 @@ import { requireKey, chat, LLM_MODEL } from './llm.js';
 import { extractResumeText } from './resume-text.js';
 import fs from 'fs';
 import path from 'path';
+import os from 'os';
 import { fileURLToPath } from 'url';
 import dotenv from 'dotenv';
 
@@ -14,7 +15,7 @@ const router = express.Router();
 
 // Multer setup for file uploads
 const upload = multer({ 
-  dest: 'uploads/',
+  dest: path.join(os.tmpdir(), 'prepninja-uploads'),
   limits: { fileSize: 5 * 1024 * 1024 } // 5MB limit
 });
 

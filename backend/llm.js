@@ -53,3 +53,26 @@ export async function chat(prompt, { system, temperature = 0.6, maxTokens = 4096
   // Strip markdown fences if the model added them.
   return text.replace(/^\s*```(?:json)?\s*/i, "").replace(/\s*```\s*$/, "").trim();
 }
+
+/** Speech-to-text for a WAV buffer with Nemotron omni (accepts audio input). */
+export async function transcribeWav(buffer) {
+  if (!llmKey()) throw new Error("NEED_KEY");
+  const res = await fetch(`${BASE_URL}/chat/completions`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json", Authorization: `Bearer ${llmKey()}` },
+    body: JSON.stringify({
+      model: process.env.NVIDIA_ASR_MODEL || "nvidia/nemotron-3-nano-omni-30b-a3b-reasoning",
+      messages: [{ role: "user", content: [
+        { type: "input_audio", input_audio: { data: buffer.toString("base64"), format: "wav" } },
+        { type: "text", text: "Transcribe exactly what the speaker says, word for word, including filler words like um and uh. Output only the transcript. If nobody speaks, output nothing." },
+      ] }],
+      temperature: 0,
+      max_tokens: 2048,
+      chat_template_kwargs: { enable_thinking: false },
+    }),
+    signal: AbortSignal.timeout(60000),
+  });
+  if (!res.ok) throw new Error(`Nemotron ASR ${res.status}: ${(await res.text()).slice(0, 200)}`);
+  const data = await res.json();
+  return (data?.choices?.[0]?.message?.content || "").trim();
+}
