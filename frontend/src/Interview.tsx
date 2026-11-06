@@ -147,7 +147,7 @@ export default function Interview() {
         console.error("❌ Failed to fetch questions:", errorMsg);
         setQuestionsError(errorMsg);
         setQuestionsLoading(false);
-        showNotificationAlert(`❌ Failed to load questions: ${errorMsg}`);
+        showNotificationAlert(`Failed to load questions: ${errorMsg}`);
       }
     }
     fetchQuestions();
@@ -509,9 +509,9 @@ export default function Interview() {
     setIsTesting(false);
     
     if (allPassed) {
-      showNotificationAlert("✅ All tests passed! Moving to next question...");
+      showNotificationAlert("All tests passed. Moving to the next question.");
     } else {
-      showNotificationAlert("❌ Some tests failed. Try again!");
+      showNotificationAlert("Some tests failed. Try again.");
     }
   }
 
@@ -532,7 +532,7 @@ export default function Interview() {
   function goNext() {
     if (index >= questions.length - 1) {
       const totalPassed = questionAttempts.filter(a => a.passed).length;
-      const summary = `Interview Complete!\n━━━━━━━━━━━━━━━━━━━━\nTopic: ${topic.toUpperCase()}\nQuestions Passed: ${totalPassed}/${questions.length}\nTotal Flags: ${flags.length}\n━━━━━━━━━━━━━━━━━━━━\n\nQuestion Summary:\n${questionAttempts.map(a => `Q: ${a.testsPassed}/${a.testsTotal} tests passed - ${a.passed ? '✅ PASS' : '❌ FAIL'}`).join('\n')}\n\n${flags.length > 0 ? '\nFlag Summary:\n' + flags.map(f => `${f.time} - ${f.message}`).join('\n') : ''}`;
+      const summary = `Interview Complete!\n━━━━━━━━━━━━━━━━━━━━\nTopic: ${topic.toUpperCase()}\nQuestions Passed: ${totalPassed}/${questions.length}\nTotal Flags: ${flags.length}\n━━━━━━━━━━━━━━━━━━━━\n\nQuestion Summary:\n${questionAttempts.map(a => `Q: ${a.testsPassed}/${a.testsTotal} tests passed - ${a.passed ? 'PASS' : 'FAIL'}`).join('\n')}\n\n${flags.length > 0 ? '\nFlag Summary:\n' + flags.map(f => `${f.time} - ${f.message}`).join('\n') : ''}`;
       alert(summary);
       exitFullscreen();
       return;
@@ -622,7 +622,7 @@ export default function Interview() {
                 <li>• Exiting fullscreen will be flagged</li>
                 <li>• Face detection every 5 seconds</li>
                 <li>• <strong className="text-destructive">Maximum {MAX_FLAGS} flags allowed</strong></li>
-                <li>• <strong className="text-green-600">✅ All tests must PASS to proceed</strong></li>
+                <li>• <strong className="text-green-600">All tests must PASS to proceed</strong></li>
               </ul>
             </div>
 
@@ -816,12 +816,12 @@ export default function Interview() {
                     {testStatus === 'passed' ? (
                       <>
                         <CheckCircle2 className="w-5 h-5 text-green-600" />
-                        <span className="text-green-700 dark:text-green-100">✅ All Tests Passed!</span>
+                        <span className="text-green-700 dark:text-green-100">All Tests Passed</span>
                       </>
                     ) : testStatus === 'failed' ? (
                       <>
                         <X className="w-5 h-5 text-destructive" />
-                        <span className="text-destructive">❌ Tests Failed</span>
+                        <span className="text-destructive">Tests Failed</span>
                       </>
                     ) : null}
                   </h3>

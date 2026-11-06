@@ -1,6 +1,5 @@
 // LLM layer: NVIDIA Nemotron through NVIDIA's OpenAI-compatible endpoint.
-// NVIDIA_API_KEY on the server is the default; a visitor can send their own
-// free key from build.nvidia.com in the X-NVIDIA-Key header.
+// Uses the server's NVIDIA_API_KEY.
 import { AsyncLocalStorage } from "node:async_hooks";
 
 const store = new AsyncLocalStorage();
@@ -8,7 +7,7 @@ const BASE_URL = process.env.NVIDIA_BASE_URL || "https://integrate.api.nvidia.co
 export const LLM_MODEL = process.env.NVIDIA_MODEL || "nvidia/nemotron-3-ultra-550b-a55b";
 
 export function llmKeyMiddleware(req, _res, next) {
-  const key = (req.get("x-nvidia-key") || process.env.NVIDIA_API_KEY || "").trim();
+  const key = (process.env.NVIDIA_API_KEY || "").trim();
   store.run({ key }, next);
 }
 
@@ -16,7 +15,7 @@ export const llmKey = () => store.getStore()?.key || process.env.NVIDIA_API_KEY 
 
 export function requireKey(_req, res, next) {
   if (llmKey()) return next();
-  return res.status(401).json({ code: "NEED_KEY", error: "Add your NVIDIA API key to use this." });
+  return res.status(401).json({ code: "NEED_KEY", error: "AI is not configured on the server." });
 }
 
 /** Single-turn chat completion. Returns the assistant text. */

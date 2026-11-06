@@ -38,11 +38,34 @@ async function call<T>(path: string, init?: RequestInit): Promise<T> {
   return r.json();
 }
 
+// Local copy of this user's profile and attempts, sent with each call so results
+// survive serverless restarts.
+const SNAP = "prepninja.engine";
+type Snap = { profile?: Record<string, unknown>; attempts: Record<string, unknown>[] };
+const readSnap = (): Snap => {
+  try { return JSON.parse(localStorage.getItem(SNAP) || "") as Snap; } catch { return { attempts: [] }; }
+};
+const writeSnap = (s: Snap) => {
+  try { localStorage.setItem(SNAP, JSON.stringify({ ...s, attempts: s.attempts.slice(-500) })); } catch { /* storage off */ }
+};
+
 export const engine = {
   companies: () => call<{ companies: string[]; topics: string[]; source: string; accessed: string }>("/companies"),
-  state: () => call<EngineState>(`/state/${userId()}`),
-  saveProfile: (p: Partial<EngineState["profile"]>) => call(`/profile/${userId()}`, { method: "PUT", body: JSON.stringify(p) }),
-  logAttempt: (a: { topic: string; difficulty?: string; testsPassed: number; testsTotal: number; timeMs: number; source?: string }) =>
-    call<{ state: EngineState }>(`/attempt/${userId()}`, { method: "POST", body: JSON.stringify(a) }),
-  deleteMe: () => call(`/user/${userId()}`, { method: "DELETE" }),
+  state: () => call<EngineState>(`/state/${userId()}`, { method: "POST", body: JSON.stringify({ snapshot: readSnap() }) }),
+  saveProfile: async (p: Partial<EngineState["profile"]>) => {
+    const snap = readSnap();
+    const saved = await call<Record<string, unknown>>(`/profile/${userId()}`, { method: "PUT", body: JSON.stringify({ ...p, snapshot: snap }) });
+    writeSnap({ ...snap, profile: saved });
+    return saved;
+  },
+  logAttempt: async (a: { topic: string; difficulty?: string; testsPassed: number; testsTotal: number; timeMs: number; source?: string }) => {
+    const snap = readSnap();
+    const out = await call<{ saved: Record<string, unknown>; state: EngineState }>(`/attempt/${userId()}`, { method: "POST", body: JSON.stringify({ ...a, snapshot: snap }) });
+    writeSnap({ ...snap, attempts: [...(snap.attempts || []), out.saved] });
+    return out;
+  },
+  deleteMe: async () => {
+    try { localStorage.removeItem(SNAP); } catch { /* noop */ }
+    return call(`/user/${userId()}`, { method: "DELETE" });
+  },
 };

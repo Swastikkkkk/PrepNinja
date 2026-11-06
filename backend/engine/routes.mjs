@@ -28,8 +28,19 @@ router.get("/companies", (_req, res) => {
   res.json({ source: CW.source, accessed: CW.accessed, companies: Object.keys(CW.weights).sort(), topics: TOPICS });
 });
 
+// Serverless instances don't share disk: the browser keeps a copy of its profile and
+// attempts and sends it along, and an empty store is seeded from that copy.
+async function hydrate(uid, snap) {
+  if (!snap || typeof snap !== "object") return;
+  if (!(await store.getProfile(uid)) && snap.profile && typeof snap.profile === "object") await store.setProfile(uid, snap.profile);
+  if (Array.isArray(snap.attempts) && snap.attempts.length && !(await store.getAttempts(uid)).length) {
+    for (const a of snap.attempts.slice(-500)) if (a && TOPICS.includes(a.topic)) await store.addAttempt(uid, a);
+  }
+}
+
 router.put("/profile/:uid", async (req, res) => {
   const b = req.body || {};
+  await hydrate(req.params.uid, b.snapshot);
   const profile = {
     targetCompany: String(b.targetCompany || ""),
     targetRole: String(b.targetRole || "SDE-1"),
@@ -61,6 +72,7 @@ function recordSolveTime(a) {
 
 router.post("/attempt/:uid", async (req, res) => {
   const b = req.body || {};
+  await hydrate(req.params.uid, b.snapshot);
   if (!TOPICS.includes(b.topic)) return res.status(400).json({ error: `topic must be one of ${TOPICS.join(", ")}` });
   const difficulty = ["easy", "medium", "hard"].includes(b.difficulty) ? b.difficulty : "medium";
   const timeMs = Math.max(0, Number(b.timeMs) || 0);
@@ -78,6 +90,10 @@ router.post("/attempt/:uid", async (req, res) => {
 });
 
 router.get("/state/:uid", async (req, res) => res.json(await computeState(req.params.uid)));
+router.post("/state/:uid", async (req, res) => {
+  await hydrate(req.params.uid, req.body?.snapshot);
+  res.json(await computeState(req.params.uid));
+});
 
 // Right to erasure: removes the profile and every stored attempt.
 router.delete("/user/:uid", async (req, res) => {
