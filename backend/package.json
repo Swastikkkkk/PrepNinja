@@ -13,8 +13,8 @@
     "multer": "^2.0.2",
     "nanoid": "^5.1.6",
     "node-fetch": "^3.3.2",
-    "pdf-parse": "^2.4.5",
     "undici": "^7.16.0",
+    "unpdf": "^1.9.1",
     "word-extractor": "^1.0.4"
   },
   "scripts": {
