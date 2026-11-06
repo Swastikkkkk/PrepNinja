@@ -6,27 +6,27 @@
 
 ![PrepNinja interview prep hub](.github/assets/screenshot.jpg)
 
-PrepNinja helps candidates prepare for both non-technical and technical interviews in one place: proctored AI mock interviews with video answers and automated scoring, a DSA/coding practice round with an in-browser code runner, and an ATS resume analyzer, all backed by Google Gemini.
+PrepNinja helps candidates prepare for both non-technical and technical interviews in one place: proctored AI mock interviews with video answers and automated scoring, a DSA/coding practice round with an in-browser code runner, and an ATS resume analyzer, all backed by NVIDIA Nemotron.
 
 ## Features
 
 ### Non-technical (behavioral) mock interviews
-- Gemini generates role-specific questions from an interviewer persona conditioned on the target company and interview type (behavioural, HR, case).
+- Nemotron generates role-specific questions from an interviewer persona conditioned on the target company and interview type (behavioural, HR, case).
 - Candidate records video answers via webcam (`MediaRecorder`), uploaded and stored on Cloudinary.
-- Answers are transcribed with Deepgram and scored by Gemini across **fluency, correctness, grammar, stammering, and content** (0–10 each, 50 total), with a rule-based fallback if AI scoring is unavailable.
+- Answers are transcribed with Deepgram and scored by Nemotron across **fluency, correctness, grammar, stammering, and content** (0–10 each, 50 total), with a rule-based fallback if AI scoring is unavailable.
 - **Proctoring**: enforces fullscreen mode and flags tab switches / fullscreen exits as suspicious events.
 
 ### Technical interview / coding practice
-- Gemini generates topic-specific coding problems (arrays, linked lists, trees, graphs, dynamic programming, etc.).
+- Nemotron generates topic-specific coding problems (arrays, linked lists, trees, graphs, dynamic programming, etc.).
 - Monaco code editor. Code runs on [Judge0](https://judge0.com) when `JUDGE0_URL` is set, with a [Piston](https://github.com/engineer-man/piston) server as fallback (the public Piston API now requires authorisation, so set `JUDGE0_URL` for real use).
-- Each generated problem ships with test cases that are kept only if Gemini's own reference solution passes them in the sandbox.
+- Each generated problem ships with test cases that are kept only if the model's own reference solution passes them in the sandbox.
 - Text-to-speech narration of questions via Murf AI.
 - Same webcam/fullscreen/tab-switch proctoring as the behavioral round.
 
 ### ATS Resume Analyzer
 - Upload a PDF/DOC/DOCX resume.
 - Optional target role and job description for job-specific keyword matching.
-- Gemini rates five dimensions (keyword coverage 35, section completeness 20, formatting 20, quantified achievements 15, action verbs 10); the weighted 0–100 total is computed server-side. Returns found and missing keywords, strengths, weaknesses and rewrite tips.
+- Resume text is extracted server-side (PDF, DOCX, DOC) and Nemotron rates five dimensions (keyword coverage 35, section completeness 20, formatting 20, quantified achievements 15, action verbs 10); the weighted 0–100 total is computed server-side. Returns found and missing keywords, strengths, weaknesses and rewrite tips.
 
 ### Skill Scoring Engine and adaptive roadmap
 - Every coding attempt updates a per-topic Topic Score from accuracy, solve speed and recency (Eq. 1).
@@ -39,7 +39,7 @@ PrepNinja helps candidates prepare for both non-technical and technical intervie
 ### Research artefacts (`research/`)
 - `benchmark/`: offline comparison of Eq. 1 with PFA, BKT and DKT on ASSISTments 2017 (5-fold, learner-level split).
 - `company_weights/`: script that builds W(t, c) from company-tagged problem lists.
-- `llm/`: reliability checks of the Gemini modules (generated-test validation, ATS score consistency) with raw results.
+- `llm/`: reliability checks of the LLM modules (originally run on Gemini) (generated-test validation, ATS score consistency) with raw results.
 - `latency/`: load test of the scoring engine.
 
 ### Admin
@@ -78,7 +78,7 @@ PrepNinja/
 
 **Frontend:** React 19, TypeScript, Vite 7, React Router, Tailwind CSS 4, shadcn/ui + Radix primitives, Monaco Editor, Framer Motion, Lucide icons
 
-**Backends:** Node.js, Express, Multer (file uploads), Cloudinary (video storage), Google Generative AI SDK (Gemini), Deepgram API (speech-to-text), Murf AI (text-to-speech), Judge0 / Piston (sandboxed code execution), optional Cloud Firestore (firebase-admin), nanoid, fs-extra
+**Backends:** Node.js, Express, Multer (file uploads), Cloudinary (video storage), NVIDIA Nemotron (OpenAI-compatible API), pdf-parse / mammoth (resume text), Deepgram API (speech-to-text), Murf AI (text-to-speech), Judge0 / Piston (sandboxed code execution), optional Cloud Firestore (firebase-admin), nanoid, fs-extra
 
 ## Getting started
 
@@ -86,7 +86,7 @@ PrepNinja/
 - Node.js (LTS) and npm
 - API keys for:
   1. **[Cloudinary](https://cloudinary.com)**, video/audio storage
-  2. **[Gemini AI](https://makersuite.google.com/app/apikey)**, question generation, scoring, resume analysis
+  2. **[NVIDIA API key](https://build.nvidia.com)** (free), question generation, scoring, resume analysis
   3. **[Deepgram](https://deepgram.com)**, speech-to-text transcription
   4. **[Murf AI](https://murf.ai)**, text-to-speech
   5. *(Optional)* **[JDoodle](https://www.jdoodle.com/compiler-api)**, alternate code compilation
@@ -104,7 +104,8 @@ Fill in `backend/.env`:
 CLOUDINARY_CLOUD_NAME=your_cloud_name_here
 CLOUDINARY_API_KEY=your_api_key_here
 CLOUDINARY_API_SECRET=your_api_secret_here
-GEMINI_API_KEY=your_gemini_api_key_here
+NVIDIA_API_KEY=nvapi-your_key_here
+NVIDIA_MODEL=nvidia/nemotron-3-ultra-550b-a55b
 DEEPGRAM_API_KEY=your_deepgram_api_key_here
 PORT=8080
 # optional, see backend/.env.example
@@ -121,7 +122,7 @@ npm test
 
 ### 2. Backend, Code API (`backend/info.js`)
 
-This is a second, separate Express server (still inside `backend/`) that powers the technical/coding round. It uses the same `GEMINI_API_KEY` from your `.env`. Code runs on Judge0 if `JUDGE0_URL` is set (self-host with the [Judge0 CE docker-compose](https://github.com/judge0/judge0/blob/master/CHANGELOG.md#deployment-procedure)), otherwise on the public Piston API.
+This is a second, separate Express server (still inside `backend/`) that powers the technical/coding round. It uses the same `NVIDIA_API_KEY` from your `.env`. Code runs on Judge0 if `JUDGE0_URL` is set (self-host with the [Judge0 CE docker-compose](https://github.com/judge0/judge0/blob/master/CHANGELOG.md#deployment-procedure)), otherwise on the public Piston API.
 
 ```bash
 # from the backend/ folder, with the same .env in place
@@ -139,7 +140,8 @@ cp ../.env.example .env   # or create frontend/.env directly
 
 Fill in `frontend/.env`:
 ```env
-VITE_GEMINI_API_KEY=your_gemini_api_key_here
+VITE_NVIDIA_API_KEY=nvapi-your_key_here
+NVIDIA_MODEL=nvidia/nemotron-3-ultra-550b-a55b
 VITE_MURF_API_KEY=your_murf_api_key_here
 VITE_JDOODLE_CLIENT_ID=your_jdoodle_client_id      # optional
 VITE_JDOODLE_CLIENT_SECRET=your_jdoodle_secret     # optional

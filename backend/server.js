@@ -4,7 +4,7 @@
 import resumeCheckRouter from './resume-check.js';
 import engineRouter from './engine/routes.mjs';
 import codingApp from './info.js';
-import { geminiKeyMiddleware, geminiKey, requireKey } from './gemini-key.js';
+import { llmKeyMiddleware, llmKey, requireKey, chat } from './llm.js';
 import express from 'express';
 import cors from 'cors';
 import multer from 'multer';
@@ -18,7 +18,7 @@ import dotenv from 'dotenv';
 dotenv.config()
 const app = express();
 app.use(cors());
-app.use(geminiKeyMiddleware);
+app.use(llmKeyMiddleware);
 app.use(express.json({ limit: '20mb' }));
 
 // Add resume check router
@@ -34,7 +34,8 @@ const CLOUDINARY_CLOUD_NAME = process.env.CLOUDINARY_CLOUD_NAME;
 const CLOUDINARY_API_KEY = process.env.CLOUDINARY_API_KEY;
 const CLOUDINARY_API_SECRET = process.env.CLOUDINARY_API_SECRET;
 
-// Model is configurable because Google retires model versions for new keys.
+// Optional: Gemini is only used as an audio-transcription fallback when Deepgram is not set.
+const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
 const GEMINI_MODEL = process.env.GEMINI_MODEL || "gemini-flash-latest";
 const DEEPGRAM_API_KEY = process.env.DEEPGRAM_API_KEY;
 
@@ -91,38 +92,12 @@ async function saveAttemptMetadata(meta) {
 }
 
 // ----------------------------
-// Gemini helper (REST generateContent)
+// LLM helper (NVIDIA Nemotron)
 // ----------------------------
-async function callGemini(promptText, model = GEMINI_MODEL) {
-  if (!geminiKey()) {
-    throw new Error("NEED_KEY");
-  }
-
-  const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`;
-  const payload = {
-    contents: [{ parts: [{ text: promptText }] }],
-  };
-
-  const res = await fetch(url, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      "x-goog-api-key": geminiKey(),
-    },
-    body: JSON.stringify(payload),
-  });
-
-  if (!res.ok) {
-    const txt = await res.text();
-    throw new Error(`Gemini error ${res.status}: ${txt}`);
-  }
-  const json = await res.json();
-  const text = json?.candidates?.[0]?.content?.parts?.[0]?.text;
-  return typeof text === "string" ? text.trim() : JSON.stringify(json);
-}
+const callLLM = (promptText) => chat(promptText);
 
 // ----------------------------
-// Generate questions using Gemini
+// Generate questions using Nemotron
 // ----------------------------
 app.post("/api/generate-questions", requireKey, async (req, res) => {
   try {
@@ -134,7 +109,7 @@ app.post("/api/generate-questions", requireKey, async (req, res) => {
     const type = ["behavioural", "hr", "case"].includes(String(interviewType).toLowerCase()) ? String(interviewType).toLowerCase() : "behavioural";
     const org = String(company).slice(0, 80);
 
-    if (geminiKey()) {
+    if (llmKey()) {
       // Persona conditioning: a consistent interviewer identity tied to the target company.
       const prompt = `
 You are a senior interviewer${org ? ` at ${org}` : ""} running a ${type} interview for this role: "${rolePrompt}".
@@ -146,7 +121,7 @@ Requirements:
 - Keep each question one or two sentences, behavioural or scenario focused.
 - Cover different competencies (e.g. conflict, failure, ownership, leadership, ambiguity).
 `;
-      const out = await callGemini(prompt);
+      const out = await callLLM(prompt);
       const parts = out.split(/\n\s*\n/).map(p => p.trim()).filter(Boolean).slice(0, n);
       if (parts.length >= Math.min(2, n)) {
         const questions = parts.map(q => ({ id: `q-${nanoid(6)}`, text: q }));
@@ -326,11 +301,11 @@ async function transcribe({ fileUrl, buffer, mimetype }) {
       } catch (e) { console.warn("Deepgram bytes failed:", e.message); }
     }
   }
-  if (buffer && geminiKey() && buffer.length < 19 * 1024 * 1024) {
+  if (buffer && GEMINI_API_KEY && buffer.length < 19 * 1024 * 1024) {
     try {
       const r = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent`, {
         method: "POST",
-        headers: { "Content-Type": "application/json", "x-goog-api-key": geminiKey() },
+        headers: { "Content-Type": "application/json", "x-goog-api-key": GEMINI_API_KEY },
         body: JSON.stringify({
           contents: [{ parts: [
             { inline_data: { mime_type: (mimetype || "video/webm").split(";")[0], data: buffer.toString("base64") } },
@@ -508,12 +483,12 @@ ${transcript || "(empty - no audio detected)"}
 
     // Step 3: Get AI scoring
     let scoring = null;
-    if (geminiKey()) {
+    if (llmKey()) {
       try {
-        const geminiResponse = await callGemini(scoringPrompt);
-        console.log("Gemini raw response:", geminiResponse?.substring(0, 200));
+        const llmResponse = await callLLM(scoringPrompt);
+        console.log("Nemotron raw response:", llmResponse?.substring(0, 200));
 
-        const parsed = extractJson(geminiResponse);
+        const parsed = extractJson(llmResponse);
         console.log("Parsed scoring:", parsed);
 
         if (parsed && (parsed.fluency !== undefined || parsed.total !== undefined)) {
@@ -521,10 +496,10 @@ ${transcript || "(empty - no audio detected)"}
           console.log("AI scoring validated:", scoring);
         }
       } catch (e) {
-        console.warn("Gemini scoring error:", e.message);
+        console.warn("Nemotron scoring error:", e.message);
       }
     } else {
-      console.log("Gemini API key not configured");
+      console.log("NVIDIA API key not configured");
     }
 
     // Step 4: Apply fallback if AI scoring failed

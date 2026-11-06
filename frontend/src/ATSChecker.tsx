@@ -188,7 +188,7 @@ export default function ATSChecker() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.1 }}
           >
-            Upload your resume and get an AI-powered ATS score analysis powered by Google Gemini. Discover what's working and how to improve your chances of passing ATS systems.
+            Upload your resume and get an AI-powered ATS score analysis powered by NVIDIA Nemotron. Discover what's working and how to improve your chances of passing ATS systems.
           </motion.p>
         </div>
 
@@ -287,7 +287,7 @@ export default function ATSChecker() {
                   {loading ? (
                     <div className="flex items-center space-x-2">
                       <Loader className="w-4 h-4 animate-spin" />
-                      <span>Analyzing with Gemini...</span>
+                      <span>Analyzing with Nemotron...</span>
                     </div>
                   ) : (
                     'Analyze Resume'

@@ -1,20 +1,18 @@
-// info.js — Gemini + Compile proxy with Topic-Specific Generation + Code Evaluation
+// info.js — Nemotron + Compile proxy with Topic-Specific Generation + Code Evaluation
 import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
 import { pathToFileURL } from "url";
-import { geminiKeyMiddleware, geminiKey, requireKey } from "./gemini-key.js";
+import { llmKeyMiddleware, requireKey, chat } from "./llm.js";
 dotenv.config();
 // Node 20+ has a global fetch.
 
 const app = express();
 app.use(cors());
-app.use(geminiKeyMiddleware);
+app.use(llmKeyMiddleware);
 app.use(express.json({ limit: "1mb" }));
 
 // ---------- CONFIG ----------
-// Model is configurable because Google retires model versions for new keys.
-const GEMINI_MODEL = process.env.GEMINI_MODEL || "gemini-flash-latest";
 
 
 // Use multiple Piston endpoints for fallback
@@ -92,37 +90,21 @@ Generate ONLY valid JSON. Do NOT include markdown code blocks or any other text.
   try {
     console.log(`🔍 Generating questions for Topic: ${topics}, Role: ${role}`);
     
-    const url = `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent?key=${geminiKey()}`;
-
-    const r = await fetch(url, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        contents: [{ role: "user", parts: [{ text: prompt }] }],
-        generationConfig: {
-          temperature: 1.0,
-          topP: 0.95,
-          topK: 40,
-        }
-      }),
-    });
-
-    if (!r.ok) {
-      const text = await r.text();
-      console.error("❌ Gemini API error:", r.status, text);
-      return res.status(r.status).json({ error: "Gemini API request failed", details: text });
+    let responseText = "";
+    try {
+      responseText = await chat(prompt, { temperature: 1.0, maxTokens: 8192 });
+    } catch (e) {
+      console.error("❌ Nemotron API error:", e.message);
+      return res.status(e.status || 502).json({ error: "Nemotron API request failed", details: e.message });
     }
-
-    const data = await r.json();
-    const responseText = data?.candidates?.[0]?.content?.parts?.[0]?.text || "";
-    console.log("📝 Raw Gemini response:", responseText);
+    console.log("📝 Raw Nemotron response:", responseText.slice(0, 300));
 
     const match = responseText.match(/\{[\s\S]*\}/);
     
     if (!match) {
-      console.error("❌ No JSON found in Gemini response");
+      console.error("❌ No JSON found in Nemotron response");
       return res.status(400).json({ 
-        error: "Invalid response format from Gemini", 
+        error: "Invalid response format from Nemotron", 
         details: "Could not extract JSON from response",
         rawResponse: responseText 
       });
@@ -131,7 +113,7 @@ Generate ONLY valid JSON. Do NOT include markdown code blocks or any other text.
     const parsed = JSON.parse(match[0]);
 
     if (!parsed.questions || parsed.questions.length === 0) {
-      console.error("❌ No questions in Gemini response");
+      console.error("❌ No questions in Nemotron response");
       return res.status(400).json({ 
         error: "No questions generated",
         details: parsed 
@@ -162,9 +144,9 @@ Generate ONLY valid JSON. Do NOT include markdown code blocks or any other text.
     return res.json({ questions: checked });
 
   } catch (err) {
-    console.error("❌ Gemini API Error:", err && err.message ? err.message : err);
+    console.error("❌ Nemotron API Error:", err && err.message ? err.message : err);
     return res.status(500).json({ 
-      error: "Gemini API request failed", 
+      error: "Nemotron API request failed", 
       details: String(err) 
     });
   }
@@ -229,29 +211,13 @@ Generate ONLY valid JSON. Do NOT include markdown code blocks.`;
   try {
     console.log(`🔍 Evaluating code for question in ${language}...`);
     
-    const url = `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent?key=${geminiKey()}`;
-
-    const r = await fetch(url, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        contents: [{ role: "user", parts: [{ text: prompt }] }],
-        generationConfig: {
-          temperature: 0.7,
-          topP: 0.9,
-          topK: 40,
-        }
-      }),
-    });
-
-    if (!r.ok) {
-      const text = await r.text();
-      console.error("❌ Gemini evaluation error:", r.status, text);
-      return res.status(r.status).json({ error: "Gemini evaluation failed", details: text });
+    let responseText = "";
+    try {
+      responseText = await chat(prompt, { temperature: 0.7 });
+    } catch (e) {
+      console.error("❌ Nemotron evaluation error:", e.message);
+      return res.status(e.status || 502).json({ error: "Nemotron evaluation failed", details: e.message });
     }
-
-    const data = await r.json();
-    const responseText = data?.candidates?.[0]?.content?.parts?.[0]?.text || "";
     console.log("📝 Raw evaluation response:", responseText);
 
     const match = responseText.match(/\{[\s\S]*\}/);

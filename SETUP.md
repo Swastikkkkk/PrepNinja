@@ -11,7 +11,7 @@ This guide will help you set up the required environment variables for the HackX
 You'll need to obtain API keys from the following services:
 
 1. **Cloudinary** (for media storage) - https://cloudinary.com
-2. **Gemini AI** (for AI features) - https://makersuite.google.com/app/apikey
+2. **NVIDIA Nemotron** (for AI features, free key) - https://build.nvidia.com
 3. **Deepgram** (for speech-to-text) - https://deepgram.com
 4. **Murf AI** (for text-to-speech) - https://murf.ai
 5. **JDoodle** (optional, for code compilation) - https://www.jdoodle.com/compiler-api
@@ -26,7 +26,6 @@ cp ../.env.example .env
 ```
 
 Edit the `.env` file and add your API keys:
-- `VITE_GEMINI_API_KEY` - Your Gemini AI API key
 - `VITE_MURF_API_KEY` - Your Murf AI API key
 - `VITE_JDOODLE_CLIENT_ID` - (Optional) Your JDoodle client ID
 - `VITE_JDOODLE_CLIENT_SECRET` - (Optional) Your JDoodle client secret
@@ -42,7 +41,7 @@ Edit the `.env` file and add your API keys:
 - `CLOUDINARY_CLOUD_NAME` - Your Cloudinary cloud name
 - `CLOUDINARY_API_KEY` - Your Cloudinary API key
 - `CLOUDINARY_API_SECRET` - Your Cloudinary API secret
-- `GEMINI_API_KEY` - Your Gemini AI API key
+- `NVIDIA_API_KEY` - Your NVIDIA API key (nvapi-...)
 - `DEEPGRAM_API_KEY` - Your Deepgram API key
 - `PORT` - Server port (default: 8080)
 

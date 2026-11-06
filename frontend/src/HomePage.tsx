@@ -117,7 +117,7 @@ const HomePage: React.FC = () => {
       description: "Upload your resume and get an ATS score with actionable improvements.",
       features: [
         "Resume ATS analysis",
-        "Gemini-powered feedback",
+        "Nemotron-powered feedback",
         "Improvement suggestions",
         "Score optimization tips",
       ],
@@ -353,7 +353,7 @@ const HomePage: React.FC = () => {
                   number: 5,
                   title: "Optimize Resume",
                   description:
-                    "Use Gemini-powered ATS analysis to ensure your resume passes through applicant tracking systems.",
+                    "Use Nemotron-powered ATS analysis to ensure your resume passes through applicant tracking systems.",
                 },
                 {
                   number: 6,

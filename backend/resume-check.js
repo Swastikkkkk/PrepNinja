@@ -1,7 +1,7 @@
 import express from 'express';
 import multer from 'multer';
-import { GoogleGenerativeAI } from '@google/generative-ai';
-import { geminiKey, requireKey } from './gemini-key.js';
+import { requireKey, chat, LLM_MODEL } from './llm.js';
+import { extractResumeText } from './resume-text.js';
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
@@ -18,15 +18,6 @@ const upload = multer({
   limits: { fileSize: 5 * 1024 * 1024 } // 5MB limit
 });
 
-// Initialize Gemini with API key from environment    
-
-console.log("✓ Gemini initialized with API key from environment");
-
-// Function to convert file to base64
-function fileToBase64(filePath) {
-  const fileContent = fs.readFileSync(filePath);
-  return fileContent.toString('base64');
-}
 
 // Function to get MIME type from file extension
 function getMimeType(fileName) {
@@ -47,7 +38,7 @@ const ATS_WEIGHTS = {
   achievement_quantification: 15,
   action_verbs: 10,
 };
-const ATS_MODEL = process.env.ATS_MODEL || process.env.GEMINI_MODEL || 'gemini-flash-latest';
+const ATS_MODEL = process.env.ATS_MODEL || LLM_MODEL;
 
 // ATS Analysis Endpoint
 router.post('/analyze-resume', requireKey, upload.single('file'), async (req, res) => {
@@ -74,24 +65,19 @@ router.post('/analyze-resume', requireKey, upload.single('file'), async (req, re
       return res.status(400).json({ error: 'Invalid file type. Please upload PDF or DOC/DOCX files.' });
     }
 
-    // Read file and convert to base64
-    const fileData = fileToBase64(filePath);
-    console.log(`File converted to base64: ${fileData.length} characters`);
 
-    // Initialize the generative model
-    const model = new GoogleGenerativeAI(geminiKey()).getGenerativeModel({ model: ATS_MODEL });
 
     // Optional target role and job description make keyword scoring job-specific.
     const targetRole = String(req.body?.targetRole || '').slice(0, 200);
     const jobDescription = String(req.body?.jobDescription || '').slice(0, 8000);
 
-    // Five scoring dimensions (paper Table 5.1). Gemini rates each 0-1; the weighted
+    // Five scoring dimensions (paper Table 5.1). Nemotron rates each 0-1; the weighted
     // total is computed here so the weights are fixed and auditable.
     const prompt = `You are an ATS (Applicant Tracking System) resume auditor.
 ${targetRole ? `Target role: ${targetRole}` : 'Target role: infer from the resume.'}
 ${jobDescription ? `Job description:\n"""${jobDescription}"""` : 'No job description was given; judge keywords against typical postings for the target role.'}
 
-Rate the attached resume on each dimension from 0.0 to 1.0:
+Rate the resume below on each dimension from 0.0 to 1.0:
 - keyword_coverage: presence of role-relevant technical and soft-skill keywords
 - section_completeness: Education, Experience, Skills and Projects sections all present
 - formatting_compliance: no tables, text boxes, columns or graphics that confuse ATS parsers
@@ -111,17 +97,17 @@ Respond ONLY with JSON:
 }`;
 
     try {
-      console.log("Sending request to Gemini API...");
-      
-      // Analyze resume with Gemini
-      const result = await model.generateContent({
-        contents: [{ role: 'user', parts: [{ inlineData: { mimeType, data: fileData } }, { text: prompt }] }],
-        generationConfig: { temperature: 0.2, responseMimeType: 'application/json' },
-      });
-
-      console.log("✓ Received response from Gemini");
-
-      const responseText = result.response.text();
+      const resumeText = await extractResumeText(filePath, mimeType);
+      if (resumeText.length < 50) {
+        fs.unlinkSync(filePath);
+        return res.status(400).json({ error: 'Could not read text from this file. Upload a text-based PDF or DOCX.' });
+      }
+      console.log("Sending request to Nemotron...");
+      const responseText = await chat(
+        `${prompt}\n\nRESUME TEXT:\n"""${resumeText.slice(0, 20000)}"""`,
+        { temperature: 0.2, json: true, model: ATS_MODEL },
+      );
+      console.log("✓ Received response from Nemotron");
       console.log("Response text length:", responseText.length);
 
       // Parse the JSON response
@@ -134,8 +120,8 @@ Respond ONLY with JSON:
         if (jsonMatch) {
           analysisResult = JSON.parse(jsonMatch[0]);
         } else {
-          console.error('Gemini Response:', responseText);
-          throw new Error('Could not extract valid JSON from Gemini response');
+          console.error('Nemotron Response:', responseText);
+          throw new Error('Could not extract valid JSON from Nemotron response');
         }
       }
 
@@ -168,17 +154,17 @@ Respond ONLY with JSON:
         weaknesses: analysisResult.weaknesses || [],
         suggestions: analysisResult.suggestions,
       });
-    } catch (geminiError) {
-      console.error('Gemini API Error:', geminiError.message);
-      console.error('Full error:', geminiError);
+    } catch (llmError) {
+      console.error('Nemotron API Error:', llmError.message);
+      console.error('Full error:', llmError);
       
       if (fs.existsSync(filePath)) {
         fs.unlinkSync(filePath);
       }
       
       res.status(500).json({
-        error: 'Failed to analyze resume with Gemini',
-        details: geminiError.message,
+        error: 'Failed to analyze resume',
+        details: llmError.message,
       });
     }
   } catch (error) {
